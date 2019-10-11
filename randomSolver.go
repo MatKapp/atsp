@@ -1,9 +1,5 @@
 package main
 
-import (
-  "fmt"
-)
-
 func solveRandom(distances [][]int) []int{
   minDistance := 99999
   SIZE := len(distances)
@@ -15,7 +11,6 @@ func solveRandom(distances [][]int) []int{
     distance := getDistance(array, distances)
     if distance < minDistance{
       minDistance = distance
-      fmt.Println(minDistance)
       copy(bestPermutation, array)
     }
   }

@@ -5,8 +5,10 @@ import(
 )
 
 func main() {
-	data := readData("data/br17.atsp")
-	fmt.Println(data)
-	result := solveRandom(data)
+	distances := readData("data/br17.atsp")
+	fmt.Println(distances)
+	permutation := solveRandom(distances)
+	result := getDistance(permutation, distances)
+	fmt.Println(permutation)
 	fmt.Println(result)
 }

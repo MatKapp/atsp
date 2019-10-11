@@ -25,19 +25,13 @@ func readData(filepath string) [][]int {
 		}
 	}
 
-
-	data := make([][]int, SIZE)
-	for i :=0; i<SIZE; i++{
-		data[i] = make([]int, SIZE)
-	}
-
+  data := makeArray2D(SIZE)
 	number_count := 0
 	for {
 		tokens := readLine(scanner)
 		if tokens == nil{
 			break
 		}
-
 
 		for _, token := range tokens{
 			row, col := divmod(number_count, SIZE)
@@ -48,6 +42,14 @@ func readData(filepath string) [][]int {
 
 	}
 	return data
+}
+
+func makeArray2D(SIZE int) [][]int{	
+  data := make([][]int, SIZE)
+	for i :=0; i<SIZE; i++{
+		data[i] = make([]int, SIZE)
+	}
+  return data
 }
 
 func getDistance(perm []int, distances [][]int) int{
