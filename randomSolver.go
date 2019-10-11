@@ -1,7 +1,11 @@
 package main
 
+import (
+  "math"
+)
+
 func solveRandom(distances [][]int) []int{
-  minDistance := 99999
+  minDistance := math.MaxInt32
   SIZE := len(distances)
   bestPermutation := make([]int, SIZE)
   array := make([]int, SIZE)
