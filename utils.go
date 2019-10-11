@@ -44,10 +44,10 @@ func readData(filepath string) [][]int {
 	return data
 }
 
-func makeArray2D(SIZE int) [][]int{	
+func makeArray2D(SIZE int) [][]int{
   data := make([][]int, SIZE)
 	for i :=0; i<SIZE; i++{
-		data[i] = make([]int, SIZE)
+		data[i] = makeArray(SIZE)
 	}
   return data
 }
@@ -64,12 +64,7 @@ func shuffle(array []int) []int {
 	var r RNG
 	SIZE := len(array)
 
-	for i := 0; i < SIZE; i++ {
-		array[i] = i
-	}
-
 	for i := uint32(SIZE - 1); i >= 1; i-- {
-
 		index := r.Uint32n(i)
 		tmp := array[index]
 		array[index] = array[i]
@@ -90,4 +85,8 @@ func readLine(scanner *bufio.Scanner) []string{
 
 func divmod(numerator int, denominator int) (int, int){
 	return numerator / denominator, numerator % denominator
+}
+
+func makeArray(SIZE int) []int{
+  return make([]int, SIZE)
 }

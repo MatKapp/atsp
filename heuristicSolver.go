@@ -6,7 +6,7 @@ import (
 
 func solveHeuristic(distances [][]int) []int{
   SIZE := len(distances)
-  permutation := make([]int, SIZE)
+  permutation := makeArray(SIZE)
   set := make(map[int]bool) // New empty set
 
   current := 0

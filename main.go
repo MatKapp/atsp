@@ -4,18 +4,18 @@ import(
 	"fmt"
 )
 
+type fn func([][]int) []int
+
 func main() {
 	distances := readData("data/br17.atsp")
+	compute(solveRandom, distances, "Random")
+	compute(solveHeuristic, distances, "Heuristic")
+}
 
-	permutation := solveRandom(distances)
+func compute(solve func([][]int) []int, distances [][]int, name string) {
+	permutation := solve(distances)
 	result := getDistance(permutation, distances)
-	fmt.Println("Random")
-	fmt.Println(permutation)
-	fmt.Println(result)
-
-	permutation = solveHeuristic(distances)
-	result = getDistance(permutation, distances)
-	fmt.Println("Heuristic")
+	fmt.Println(name)
 	fmt.Println(permutation)
 	fmt.Println(result)
 }
