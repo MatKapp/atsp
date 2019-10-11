@@ -50,8 +50,12 @@ func readData(filepath string) [][]int {
 	return data
 }
 
-func getDistance(permutation []int) int{
-	return 0
+func getDistance(perm []int, distances [][]int) int{
+  sum := 0
+	for i := 1; i < len(perm); i++{
+    sum += distances[perm[i-1]][perm[i]]
+  }
+  return sum
 }
 
 func shuffle(array []int) []int {
