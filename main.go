@@ -44,9 +44,10 @@ func compute(solve func([][]int) ([]int, int), distances [][]int, name string) t
 	elapsed := time.Since(start)
 	bestResult := max(results)
 	meanResult := mean(results)
+	stdResult := std(results)
 	meanSteps := mean(stepCounts)
 
-	fmt.Println(name, elapsed, bestResult, meanResult, meanSteps)
+	fmt.Println(name, elapsed, bestResult, meanResult, meanSteps, stdResult)
 	return elapsed
 }
 

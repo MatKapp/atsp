@@ -108,12 +108,23 @@ func max(array []int) int{
 	return maxValue
 }
 
-func mean(array []int) int {
-	sum := 0
+func mean(array []int) float64 {
+	sum := 0.0
 	for _, val := range array{
-		sum += val
+		sum += float64(val)
 	}
-	return sum / len(array)
+	return sum / float64(len(array))
+}
+
+func std(array []int) float64 {
+	meanValue := mean(array)
+
+	sum := 0.0
+	for _, val := range array{
+		diff := float64(val) - meanValue
+		sum += diff * diff
+	}
+	return math.Sqrt(sum / float64(len(array)))
 }
 
 func createNeighbor(permutation []int, start int, end int) []int {
