@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"math"
 )
 
 func readData(filepath string) [][]int {
@@ -95,6 +96,24 @@ func divmod(numerator int, denominator int) (int, int) {
 
 func makeArray(SIZE int) []int {
 	return make([]int, SIZE)
+}
+
+func max(array []int) int{
+	maxValue := math.MinInt32
+	for _, val := range array{
+		if val > maxValue{
+			maxValue = val
+		}
+	}
+	return maxValue
+}
+
+func mean(array []int) int {
+	sum := 0
+	for _, val := range array{
+		sum += val
+	}
+	return sum / len(array)
 }
 
 func createNeighbor(permutation []int, start int, end int) []int {

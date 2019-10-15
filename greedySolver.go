@@ -1,6 +1,6 @@
 package main
 
-func solveGreedy(distances [][]int) []int {
+func solveGreedy(distances [][]int) ([]int, int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 
@@ -11,6 +11,7 @@ func solveGreedy(distances [][]int) []int {
 
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
+	stepCount := 0
 
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
@@ -20,9 +21,10 @@ func solveGreedy(distances [][]int) []int {
 		if newResult < bestResult {
 			bestResult = newResult
 			resultImproved = true
+			stepCount += 1
 		}
 	}
-	return permutation
+	return permutation, stepCount
 }
 
 func findBetterNeighbor(permutation []int, distances [][]int) []int {

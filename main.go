@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type fn func([][]int) []int
+type fn func([][]int) ([]int, int)
 
 func main() {
 	instanceFilenames := []string{
@@ -31,22 +31,31 @@ func main() {
 	}
 }
 
-func compute(solve func([][]int) []int, distances [][]int, name string) time.Duration {
-	fmt.Println(name)
+func compute(solve func([][]int) ([]int, int), distances [][]int, name string) time.Duration {
+	results := makeArray(10)
+	stepCounts := makeArray(10)
 
 	start := time.Now()
 	for i := 0; i < 10; i++ {
-		permutation := solve(distances)
-		result := getDistance(permutation, distances)
-		fmt.Println(result)
+		permutation, stepCount := solve(distances)
+		stepCounts[i] = stepCount
+		results[i] = getDistance(permutation, distances)
 	}
+	elapsed := time.Since(start)
+	bestResult := max(results)
+	meanResult := mean(results)
+	meanSteps := mean(stepCounts)
 
-	return time.Since(start)
+	fmt.Println(name, elapsed, bestResult, meanResult, meanSteps)
+	return elapsed
 }
 
-func computeRandom(distances [][]int, time time.Duration){
-	fmt.Println("Random")
-	permutation := solveRandom(distances, time)
+func computeRandom(distances [][]int, availableTime time.Duration) time.Duration{
+	start := time.Now()
+	permutation := solveRandom(distances, availableTime	)
 	result := getDistance(permutation, distances)
-	fmt.Println(result)
+	elapsed := time.Since(start)
+
+	fmt.Println("Random", elapsed, result)
+	return elapsed
 }

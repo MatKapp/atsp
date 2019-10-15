@@ -4,7 +4,7 @@ import (
 	"math"
 )
 
-func solveHeuristic(distances [][]int) []int {
+func solveHeuristic(distances [][]int) ([]int, int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	set := make(map[int]bool) // New empty set
@@ -17,7 +17,7 @@ func solveHeuristic(distances [][]int) []int {
 		next := findNext(current, distances, set, SIZE)
 		current = next
 	}
-	return permutation
+	return permutation, 1
 }
 
 func findNext(index int, distances [][]int, set map[int]bool, SIZE int) int {
