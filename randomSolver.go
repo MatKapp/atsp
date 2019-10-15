@@ -2,9 +2,11 @@ package main
 
 import (
 	"math"
+	"time"
 )
 
-func solveRandom(distances [][]int) []int {
+func solveRandom(distances [][]int, availableTime time.Duration) []int {
+	start := time.Now()
 	minDistance := math.MaxInt32
 	SIZE := len(distances)
 	bestPermutation := makeArray(SIZE)
@@ -14,13 +16,16 @@ func solveRandom(distances [][]int) []int {
 		array[i] = i
 	}
 
-	for i := 0; i < 1000; i++ {
+	for {
 		array = shuffle(array)
 		distance := getDistance(array, distances)
 
 		if distance < minDistance {
 			minDistance = distance
 			copy(bestPermutation, array)
+		}
+		if time.Since(start) > availableTime {
+			break
 		}
 	}
 	return bestPermutation
