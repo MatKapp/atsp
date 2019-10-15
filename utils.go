@@ -96,3 +96,17 @@ func divmod(numerator int, denominator int) (int, int) {
 func makeArray(SIZE int) []int {
 	return make([]int, SIZE)
 }
+
+func createNeighbor(permutation []int, start int, end int) []int {
+	distance := end - start
+	SIZE := len(permutation)
+	result := makeArray(SIZE)
+	copy(result, permutation)
+
+	for i := 0; i < distance/2; i++ {
+		temp := result[start+i]
+		result[start+i] = result[end-i]
+		result[end-i] = temp
+	}
+	return result
+}

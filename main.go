@@ -1,6 +1,6 @@
 package main
 
-import(
+import (
 	"fmt"
 )
 
@@ -10,6 +10,8 @@ func main() {
 	distances := readData("data/br17.atsp")
 	compute(solveRandom, distances, "Random")
 	compute(solveHeuristic, distances, "Heuristic")
+	compute(solveGreedy, distances, "Greedy")
+	compute(solveSteepest, distances, "Steepest")
 }
 
 func compute(solve func([][]int) []int, distances [][]int, name string) {
