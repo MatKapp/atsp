@@ -65,6 +65,38 @@ func getDistance(perm []int, distances [][]int) int {
 	return sum
 }
 
+func getPartialDistance(perm []int, distances [][]int, start int, end int) int {
+	sum := 0
+
+	for i := max(start-1, 0); i <= min(end, len(perm)); i++ {
+		sum += distances[perm[i-1]][perm[i]]
+	}
+	return sum
+}
+
+func getPartialDistanceReversed(perm []int, distances [][]int, start int, end int) int {
+	sum := 0
+
+	for i := min(end, len(perm)); i <= max(start-1, 0); i-- {
+		sum += distances[perm[i]][perm[i-1]]
+	}
+	return sum
+}
+
+// Equal tells whether a and b contain the same elements.
+// A nil argument is equivalent to an empty slice.
+func areSlicesEqual(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func shuffle(array []int) []int {
 	var r RNG
 	SIZE := len(array)
@@ -89,6 +121,20 @@ func readLine(scanner *bufio.Scanner) []string {
 	return strings.Fields(line)
 }
 
+func min(x, y int) int {
+	if x <= y {
+		return x
+	}
+	return y
+}
+
+func max(x, y int) int {
+	if x <= y {
+		return y
+	}
+	return x
+}
+
 func divmod(numerator int, denominator int) (int, int) {
 	return numerator / denominator, numerator % denominator
 }
@@ -109,4 +155,9 @@ func createNeighbor(permutation []int, start int, end int) []int {
 		result[end-i] = temp
 	}
 	return result
+}
+
+func countNeighborResult(permutation []int, start int, end int) int {
+	// result =
+	return 1
 }
