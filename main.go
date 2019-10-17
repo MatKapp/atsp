@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"time"
+	"os"
+	"encoding/csv"
 )
 
 type fn func([][]int) ([]int, int)
 
-const MIN_TIME = 1000 * 1000 * 1000
+const MIN_TIME = 1000 * 1000
+const RUN_COUNT = 10
 
 func main() {
 	bestKnownSolutions := map[string]int{
@@ -52,6 +55,20 @@ func main() {
 		"ftv70",
 	}
 
+	gFile, greedyWriter := getWriter("results/greedy.csv")
+	sFile, steepestWriter := getWriter("results/steepest.csv")
+	hFile, heuristicWriter := getWriter("results/heuristic.csv")
+	rFile, randomWriter := getWriter("results/random.csv")
+
+	defer gFile.Close()
+	defer sFile.Close()
+	defer hFile.Close()
+	defer rFile.Close()
+	defer greedyWriter.Flush()
+	defer steepestWriter.Flush()
+	defer heuristicWriter.Flush()
+	defer randomWriter.Flush()
+
 	for _, filename := range instanceFilenames {
 		fmt.Println()
 		fmt.Println(filename)
@@ -61,48 +78,74 @@ func main() {
 		bestKnown := bestKnownSolutions[filename]
 		fmt.Println("Best known: ", bestKnown)
 
-		computeHeuristic(distances)
-		compute(solveGreedy, distances, "Greedy")
-		steepestElapsed := compute(solveSteepest, distances, "Steepest")
-		computeRandom(distances, steepestElapsed)
+		hOutput := computeHeuristic(distances)
+		heuristicWriter.Write(hOutput)
+
+		_, gOutput := compute(solveGreedy, distances, bestKnown, "Greedy")
+		greedyWriter.Write(gOutput)
+
+		steepestElapsed, sOutput := compute(solveSteepest, distances, bestKnown, "Steepest")
+		steepestWriter.Write(sOutput)
+
+		rOutput := computeRandom(distances, steepestElapsed)
+		randomWriter.Write(rOutput)
 	}
 }
 
-func compute(solve func([][]int) ([]int, int), distances [][]int, name string) time.Duration {
-	results := makeArray(10)
-	stepCounts := makeArray(10)
+func compute(solve func([][]int) ([]int, int), distances [][]int, bestKnown int, name string) (time.Duration, []string) {
+	qualities := makeArray(RUN_COUNT)
+	stepCounts := makeArray(RUN_COUNT)
 
 	start := time.Now()
-	for i := 0; i < 10 || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
+	for i := 0; i < RUN_COUNT || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
 		permutation, stepCount := solve(distances)
-		if i < 10 {
+		if i < RUN_COUNT {
 			stepCounts[i] = stepCount
-			results[i] = getDistance(permutation, distances)
+			distance := getDistance(permutation, distances)
+			qualities[i] = distance - bestKnown
 		}
 	}
 	elapsed := time.Since(start)
-	bestResult := max(results)
-	meanResult := mean(results)
+	bestResult := min(qualities)
+	meanResult := mean(qualities)
 
-	stdResult := std(results)
+	stdResult := std(qualities)
 	meanSteps := mean(stepCounts)
 
 	fmt.Println(name, "elapsed: ", elapsed, "best: ", bestResult, "mean: ", meanResult, "steps(mean): ", meanSteps, "std result: ", stdResult)
-	return elapsed
+	output := []string{
+		itoa(bestResult),
+		ftoa(meanResult),
+		ftoa(meanSteps),
+		ftoa(stdResult),
+		itoa(int(elapsed.Nanoseconds())),
+	}
+	return elapsed, output
 }
 
-func computeHeuristic(distances [][]int){
+func computeHeuristic(distances [][]int) []string{
 	permutation := solveHeuristic(distances)
 	result := getDistance(permutation, distances)
 	fmt.Println("Heuristic result: ", result)
+	return []string{itoa(result)}
 }
 
-func computeRandom(distances [][]int, availableTime time.Duration) time.Duration{
+func computeRandom(distances [][]int, availableTime time.Duration) []string{
 	start := time.Now()
-	permutation := solveRandom(distances, availableTime	)
+	permutation := solveRandom(distances, availableTime)
 	result := getDistance(permutation, distances)
 	elapsed := time.Since(start)
 
 	fmt.Println("Random, elapsed: ", elapsed, "result: ", result)
-	return elapsed
+	output := []string{
+		itoa(result),
+		itoa(int(elapsed.Nanoseconds())),
+	}
+	return output
+}
+
+func getWriter(filename string) (*os.File, *csv.Writer){
+	file, _ := os.Create(filename)
+	writer := csv.NewWriter(file)
+	return file, writer
 }

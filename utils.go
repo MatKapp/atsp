@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"math"
+	"fmt"
 )
 
 func readData(filepath string) [][]int {
@@ -59,10 +60,12 @@ func makeArray2D(SIZE int) [][]int {
 
 func getDistance(perm []int, distances [][]int) int {
 	sum := 0
+	SIZE := len(perm)
 
-	for i := 1; i < len(perm); i++ {
+	for i := 1; i < SIZE; i++ {
 		sum += distances[perm[i-1]][perm[i]]
 	}
+	sum += distances[SIZE - 1][0]
 	return sum
 }
 
@@ -108,6 +111,16 @@ func max(array []int) int{
 	return maxValue
 }
 
+func min(array []int) int{
+	minValue := math.MaxInt32
+	for _, val := range array{
+		if val < minValue{
+			minValue = val
+		}
+	}
+	return minValue
+}
+
 func mean(array []int) float64 {
 	sum := 0.0
 	for _, val := range array{
@@ -139,4 +152,12 @@ func createNeighbor(permutation []int, start int, end int) []int {
 		result[end-i] = temp
 	}
 	return result
+}
+
+func itoa(value int) string{
+	return strconv.Itoa(value)
+}
+
+func ftoa(value float64) string{
+	return fmt.Sprintf("%f", value)
 }
