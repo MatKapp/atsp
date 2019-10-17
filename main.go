@@ -7,6 +7,7 @@ import (
 
 type fn func([][]int) ([]int, int)
 
+const MIN_TIME = 1000 * 1000 * 1000
 
 func main() {
 	bestKnownSolutions := map[string]int{
@@ -60,7 +61,7 @@ func main() {
 		bestKnown := bestKnownSolutions[filename]
 		fmt.Println("Best known: ", bestKnown)
 
-		compute(solveHeuristic, distances, "Heuristic")
+		computeHeuristic(distances)
 		compute(solveGreedy, distances, "Greedy")
 		steepestElapsed := compute(solveSteepest, distances, "Steepest")
 		computeRandom(distances, steepestElapsed)
@@ -72,10 +73,12 @@ func compute(solve func([][]int) ([]int, int), distances [][]int, name string) t
 	stepCounts := makeArray(10)
 
 	start := time.Now()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 10 || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
 		permutation, stepCount := solve(distances)
-		stepCounts[i] = stepCount
-		results[i] = getDistance(permutation, distances)
+		if i < 10 {
+			stepCounts[i] = stepCount
+			results[i] = getDistance(permutation, distances)
+		}
 	}
 	elapsed := time.Since(start)
 	bestResult := max(results)
@@ -84,8 +87,14 @@ func compute(solve func([][]int) ([]int, int), distances [][]int, name string) t
 	stdResult := std(results)
 	meanSteps := mean(stepCounts)
 
-	fmt.Println(name, "elapsed: ", elapsed, "best: ", bestResult, "mean: ", meanResult, "meas steps: ", meanSteps, "std result: ", stdResult)
+	fmt.Println(name, "elapsed: ", elapsed, "best: ", bestResult, "mean: ", meanResult, "steps(mean): ", meanSteps, "std result: ", stdResult)
 	return elapsed
+}
+
+func computeHeuristic(distances [][]int){
+	permutation := solveHeuristic(distances)
+	result := getDistance(permutation, distances)
+	fmt.Println("Heuristic result: ", result)
 }
 
 func computeRandom(distances [][]int, availableTime time.Duration) time.Duration{
