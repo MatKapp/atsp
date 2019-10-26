@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from os import path
 
 
 def draw_plot(df, x_label, y_label, label):
@@ -15,9 +16,11 @@ def draw_plot(df, x_label, y_label, label):
 
 def draw_for_files(files, x_label, y_label):
     for file in files:
-        df = pd.read_csv(f'../results/{file}.csv')
+        data_path = path.join('..', 'results', f'{file}.csv')
+        df = pd.read_csv(data_path)
         draw_plot(df, x_label, y_label, file)
-    plt.show()
+    graph_path = path.join('..', 'graphs', f'{x_label}_{y_label}.png')
+    plt.savefig(graph_path)
 
 
 if __name__ == '__main__':
