@@ -111,8 +111,8 @@ func max(array []int) int{
 	return maxValue
 }
 
-func min(array []int) int{
-	minValue := math.MaxInt32
+func min(array []float64) float64{
+	minValue := math.MaxFloat64
 	for _, val := range array{
 		if val < minValue{
 			minValue = val
@@ -121,7 +121,15 @@ func min(array []int) int{
 	return minValue
 }
 
-func mean(array []int) float64 {
+func mean(array []float64) float64 {
+	sum := 0.0
+	for _, val := range array{
+		sum += val
+	}
+	return sum / float64(len(array))
+}
+
+func meanInt(array []int) float64 {
 	sum := 0.0
 	for _, val := range array{
 		sum += float64(val)
@@ -129,7 +137,7 @@ func mean(array []int) float64 {
 	return sum / float64(len(array))
 }
 
-func std(array []int) float64 {
+func std(array []float64) float64 {
 	meanValue := mean(array)
 
 	sum := 0.0
@@ -160,4 +168,8 @@ func itoa(value int) string{
 
 func ftoa(value float64) string{
 	return fmt.Sprintf("%f", value)
+}
+
+func getQuality(result int, bestKnown int) float64{
+	return float64(result) / float64(bestKnown)
 }
