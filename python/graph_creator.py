@@ -4,21 +4,27 @@ import pandas as pd
 from os import path
 
 
-def draw_plot(df, x_label, y_label, label):
+def draw_plot(df, label, x_label, y_label, e_label=None):
     # Plotting the data
     x = df[x_label]
     y = df[y_label]
-    plt.plot(x, y, label=label)
+
+    if e_label:
+        e = df[e_label]
+        plt.errorbar(x, y, e, label=label, marker='^')
+    else:
+        plt.plot(x, y, label=label, marker='^')
 
     # Adding a legend
     plt.legend()
 
 
-def draw_for_files(files, x_label, y_label):
+def draw_for_files(files, x_label, y_label, e_label=None):
+    plt.clf()
     for file in files:
         data_path = path.join('..', 'results', f'{file}.csv')
         df = pd.read_csv(data_path)
-        draw_plot(df, x_label, y_label, file)
+        draw_plot(df, file,  x_label, y_label, e_label)
     graph_path = path.join('..', 'graphs', f'{x_label}_{y_label}.png')
     plt.savefig(graph_path)
 
@@ -29,4 +35,5 @@ if __name__ == '__main__':
     gsrh_files = gsr_files + ['heuristic']
     draw_for_files(gsrh_files, 'size', 'best')
     draw_for_files(gsr_files, 'size', 'time')
-    draw_for_files(gs_files, 'size', 'mean')
+    draw_for_files(gs_files, 'size', 'mean', 'std')
+    draw_for_files(gs_files, 'size', 'mean_steps')

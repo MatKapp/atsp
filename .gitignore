@@ -2,3 +2,4 @@ atsp
 *.exe
 .vscode/launch.json
 results/*
+graphs/*
