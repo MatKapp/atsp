@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -58,28 +60,29 @@ func makeArray2D(SIZE int) [][]int {
 
 func getDistance(perm []int, distances [][]int) int {
 	sum := 0
+	SIZE := len(perm)
 
-	for i := 1; i < len(perm); i++ {
+	for i := 1; i < SIZE; i++ {
 		sum += distances[perm[i-1]][perm[i]]
 	}
 
-	sum += distances[perm[len(perm)-1]][perm[0]]
+	sum += distances[perm[SIZE-1]][perm[0]]
 
 	return sum
 }
 
 func getPartialDistance(perm []int, distances [][]int, start int, end int) int {
-
+	SIZE := len(perm)
 	numberOfSteps := end - start + 2
 	sum := 0
-	startIndex := (start - 1 + len(perm)) % len(perm)
+	startIndex := (start - 1 + SIZE) % SIZE
 
 	for i := 0; i < numberOfSteps; i++ {
-		sum += distances[perm[(startIndex+i)%len(perm)]][perm[(startIndex+i+1)%(len(perm))]]
+		sum += distances[perm[(startIndex+i)%SIZE]][perm[(startIndex+i+1)%SIZE]]
 	}
 
-	if start == 0 && end == len(perm)-1 {
-		sum -= distances[perm[len(perm)-1]][perm[0]]
+	if start == 0 && end == SIZE-1 {
+		sum -= distances[perm[SIZE-1]][perm[0]]
 	}
 
 	return sum
@@ -162,6 +165,53 @@ func makeArray(SIZE int) []int {
 	return make([]int, SIZE)
 }
 
+func maxOfArray(array []int) int {
+	maxValue := math.MinInt32
+	for _, val := range array {
+		if val > maxValue {
+			maxValue = val
+		}
+	}
+	return maxValue
+}
+
+func minOfArray(array []float64) float64 {
+	minValue := math.MaxFloat64
+	for _, val := range array {
+		if val < minValue {
+			minValue = val
+		}
+	}
+	return minValue
+}
+
+func mean(array []float64) float64 {
+	sum := 0.0
+	for _, val := range array {
+		sum += val
+	}
+	return sum / float64(len(array))
+}
+
+func meanInt(array []int) float64 {
+	sum := 0.0
+	for _, val := range array {
+		sum += float64(val)
+	}
+	return sum / float64(len(array))
+}
+
+func std(array []float64) float64 {
+	meanValue := mean(array)
+
+	sum := 0.0
+	for _, val := range array {
+		diff := float64(val) - meanValue
+		sum += diff * diff
+	}
+	return math.Sqrt(sum / float64(len(array)))
+}
+
 func createNeighbor(permutation []int, start int, end int) []int {
 	distance := end - start
 	SIZE := len(permutation)
@@ -201,4 +251,16 @@ func bitSwap(permutation []int, first int, second int) []int {
 		permutation[first] ^= permutation[second]
 	}
 	return permutation
+}
+
+func itoa(value int) string {
+	return strconv.Itoa(value)
+}
+
+func ftoa(value float64) string {
+	return fmt.Sprintf("%f", value)
+}
+
+func getQuality(result int, bestKnown int) float64 {
+	return float64(result) / float64(bestKnown)
 }
