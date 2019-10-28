@@ -1,22 +1,32 @@
 package main
 
-import "testing"
+import (
+	"log"
+	"testing"
+	"time"
+)
 
-// test greedy optimization
+// test greedy optimization (COMMENT PERMUTATAION SHUFFLE BEFORE THE TEST)
 func TestGreedy(t *testing.T) {
 	distances := readData("data/br17.atsp")
-	SIZE := len(distances)
-	permutation := makeArray(SIZE)
+	greedyResult := []int{}
+	optimizedGreedyResult := []int{}
 
-	for i := 0; i < SIZE; i++ {
-		permutation[i] = i
+	start := time.Now()
+	for i := 0; i <= 1000; i++ {
+		greedyResult = solveGreedy(distances)
 	}
-	permutation = shuffle(permutation)
+	elapsed := time.Since(start)
+	log.Printf("greedy took %s", elapsed)
 
-	greedyResult := solveGreedy(distances)
-	optimizedGreedyResult := solveOptimizedGreedy(distances)
+	start = time.Now()
+	for i := 0; i <= 1000; i++ {
+		optimizedGreedyResult = solveOptimizedGreedy(distances)
+	}
+	elapsed = time.Since(start)
+	log.Printf("optimizedGreedy took %s", elapsed)
 
-	if areSlicesEqual(greedyResult, optimizedGreedyResult) {
-		t.Error("Greedy optimization break the result")
+	if !areSlicesEqual(greedyResult, optimizedGreedyResult) {
+		t.Error("Greedy optimization broke the result")
 	}
 }

@@ -7,7 +7,7 @@ func solveGreedy(distances [][]int) []int {
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	//permutation = shuffle(permutation)
 
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
@@ -32,19 +32,37 @@ func solveOptimizedGreedy(distances [][]int) []int {
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	//permutation = shuffle(permutation)
 
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
-		permutation = findBetterNeighbor(permutation, distances)
+		permutation = findBetterNeighborOptimized(permutation, distances)
 		newResult := getDistance(permutation, distances)
 
 		if newResult < bestResult {
 			bestResult = newResult
 			resultImproved = true
+		}
+	}
+	return permutation
+}
+
+func findBetterNeighborOptimized(permutation []int, distances [][]int) []int {
+	SIZE := len(permutation)
+	result := makeArray(SIZE)
+
+	for i := 0; i < SIZE; i++ {
+		for j := 0; j < SIZE; j++ {
+			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+
+			if neighborProfit > 0 {
+				neighbor := createNeighbor(permutation, i, j)
+				copy(result, neighbor)
+				return result
+			}
 		}
 	}
 	return permutation

@@ -11,6 +11,7 @@ func main() {
 	compute(solveRandom, distances, "Random")
 	compute(solveHeuristic, distances, "Heuristic")
 	compute(solveGreedy, distances, "Greedy")
+	compute(solveOptimizedGreedy, distances, "optimized Greedy")
 	compute(solveSteepest, distances, "Steepest")
 }
 

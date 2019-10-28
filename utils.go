@@ -62,25 +62,44 @@ func getDistance(perm []int, distances [][]int) int {
 	for i := 1; i < len(perm); i++ {
 		sum += distances[perm[i-1]][perm[i]]
 	}
+
+	sum += distances[perm[len(perm)-1]][perm[0]]
+
 	return sum
 }
 
 func getPartialDistance(perm []int, distances [][]int, start int, end int) int {
-	sum := 0
 
-	for i := max(start-1, 0); i <= min(end, len(perm)); i++ {
-		sum += distances[perm[i-1]][perm[i]]
+	numberOfSteps := end - start + 2
+	sum := 0
+	startIndex := (start - 1 + len(perm)) % len(perm)
+
+	for i := 0; i < numberOfSteps; i++ {
+		sum += distances[perm[(startIndex+i)%len(perm)]][perm[(startIndex+i+1)%(len(perm))]]
 	}
+
+	if start == 0 && end == len(perm)-1 {
+		sum -= distances[perm[len(perm)-1]][perm[0]]
+	}
+
 	return sum
 }
 
 func getPartialDistanceReversed(perm []int, distances [][]int, start int, end int) int {
 	sum := 0
-
-	for i := min(end, len(perm)); i <= max(start-1, 0); i-- {
-		sum += distances[perm[i]][perm[i-1]]
-	}
+	perm = reversePermutationPart(perm, start, end)
+	sum = getPartialDistance(perm, distances, start, end)
+	perm = reversePermutationPart(perm, start, end)
 	return sum
+}
+
+func reversePermutationPart(perm []int, start int, end int) []int {
+	swapsNumber := (end - start) / 2
+
+	for i := 0; i < swapsNumber; i++ {
+		bitSwap(perm, start+i, end-i)
+	}
+	return perm
 }
 
 // Equal tells whether a and b contain the same elements.
@@ -157,7 +176,27 @@ func createNeighbor(permutation []int, start int, end int) []int {
 	return result
 }
 
+func countNeighborDistanceDifference(permutation []int, distances [][]int, start int, end int) int {
+	actualPartialDistance := getPartialDistance(permutation, distances, start, end)
+	newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end)
+	return actualPartialDistance - newPartialDistance
+}
+
 func countNeighborResult(permutation []int, start int, end int) int {
 	// result =
 	return 1
+}
+
+func tmpSwap(permutation []int, first int, second int) []int {
+	tmp := permutation[first]
+	permutation[first] = permutation[second]
+	permutation[second] = tmp
+	return permutation
+}
+
+func bitSwap(permutation []int, first int, second int) []int {
+	permutation[first] ^= permutation[second]
+	permutation[second] ^= permutation[first]
+	permutation[first] ^= permutation[second]
+	return permutation
 }
