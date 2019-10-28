@@ -13,6 +13,7 @@ func main() {
 	compute(solveGreedy, distances, "Greedy")
 	compute(solveOptimizedGreedy, distances, "optimized Greedy")
 	compute(solveSteepest, distances, "Steepest")
+	compute(solveOptimizedSteepest, distances, "optimized Steepest")
 }
 
 func compute(solve func([][]int) []int, distances [][]int, name string) {
