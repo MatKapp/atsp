@@ -1,6 +1,6 @@
 package main
 
-func solveGreedy(distances [][]int) []int {
+func solveSwapGreedy(distances [][]int) []int {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 
@@ -14,7 +14,7 @@ func solveGreedy(distances [][]int) []int {
 
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
-		permutation = findBetterNeighbor(permutation, distances)
+		permutation = findBetterSwapNeighbor(permutation, distances)
 		newResult := getDistance(permutation, distances)
 
 		if newResult < bestResult {
@@ -25,7 +25,7 @@ func solveGreedy(distances [][]int) []int {
 	return permutation
 }
 
-func solveOptimizedGreedy(distances [][]int) []int {
+func solveOptimizedSwapGreedy(distances [][]int) []int {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 
@@ -39,7 +39,7 @@ func solveOptimizedGreedy(distances [][]int) []int {
 
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
-		permutation = findBetterNeighborOptimized(permutation, distances)
+		permutation = findBetterSwapNeighborOptimized(permutation, distances)
 		newResult := getDistance(permutation, distances)
 
 		if newResult < bestResult {
@@ -50,7 +50,7 @@ func solveOptimizedGreedy(distances [][]int) []int {
 	return permutation
 }
 
-func findBetterNeighborOptimized(permutation []int, distances [][]int) []int {
+func findBetterSwapNeighborOptimized(permutation []int, distances [][]int) []int {
 	SIZE := len(permutation)
 	result := makeArray(SIZE)
 
@@ -68,14 +68,15 @@ func findBetterNeighborOptimized(permutation []int, distances [][]int) []int {
 	return permutation
 }
 
-func findBetterNeighbor(permutation []int, distances [][]int) []int {
+func findBetterSwapNeighbor(permutation []int, distances [][]int) []int {
 	SIZE := len(permutation)
 	result := makeArray(SIZE)
+	copy(result, permutation)
 	oldResult := getDistance(permutation, distances)
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
-			neighbor := createNeighbor(permutation, i, j)
+			neighbor := tmpSwap(permutation, i, j)
 			newResult := getDistance(neighbor, distances)
 
 			if newResult < oldResult {
@@ -84,5 +85,5 @@ func findBetterNeighbor(permutation []int, distances [][]int) []int {
 			}
 		}
 	}
-	return permutation
+	return result
 }

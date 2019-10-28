@@ -195,8 +195,10 @@ func tmpSwap(permutation []int, first int, second int) []int {
 }
 
 func bitSwap(permutation []int, first int, second int) []int {
-	permutation[first] ^= permutation[second]
-	permutation[second] ^= permutation[first]
-	permutation[first] ^= permutation[second]
+	if first != second {
+		permutation[first] ^= permutation[second]
+		permutation[second] ^= permutation[first]
+		permutation[first] ^= permutation[second]
+	}
 	return permutation
 }

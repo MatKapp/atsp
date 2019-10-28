@@ -1,6 +1,6 @@
 package main
 
-func solveSteepest(distances [][]int) []int {
+func solveReverseSteepest(distances [][]int) []int {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 
@@ -25,7 +25,7 @@ func solveSteepest(distances [][]int) []int {
 	return permutation
 }
 
-func solveOptimizedSteepest(distances [][]int) []int {
+func solveOptimizedReverseSteepest(distances [][]int) []int {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 

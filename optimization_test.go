@@ -13,15 +13,16 @@ func TestGreedy(t *testing.T) {
 	optimizedGreedyResult := []int{}
 
 	start := time.Now()
+
 	for i := 0; i <= 1000; i++ {
-		greedyResult = solveGreedy(distances)
+		greedyResult = solveReverseGreedy(distances)
 	}
 	elapsed := time.Since(start)
 	log.Printf("greedy took %s", elapsed)
 
 	start = time.Now()
 	for i := 0; i <= 1000; i++ {
-		optimizedGreedyResult = solveOptimizedGreedy(distances)
+		optimizedGreedyResult = solveOptimizedReverseGreedy(distances)
 	}
 	elapsed = time.Since(start)
 	log.Printf("optimizedGreedy took %s", elapsed)

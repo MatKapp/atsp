@@ -57,3 +57,23 @@ func TestReversePermutationPart(t *testing.T) {
 		t.Error("ReversePermutationPart error")
 	}
 }
+
+func TestSwap(t *testing.T) {
+	perm := []int{1, 2, 3, 4, 5, 6, 7}
+	SIZE := len(perm)
+	swapped1 := makeArray(SIZE)
+	swapped2 := makeArray(SIZE)
+	copy(swapped1, perm)
+	copy(swapped2, perm)
+
+	for i := 0; i < SIZE; i++ {
+		for j := 0; j < SIZE; j++ {
+			swapped1 = tmpSwap(swapped1, i, j)
+			swapped2 = bitSwap(swapped2, i, j)
+
+			if !areSlicesEqual(swapped1, swapped2) {
+				t.Error("swapped values are different")
+			}
+		}
+	}
+}

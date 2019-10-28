@@ -10,10 +10,11 @@ func main() {
 	distances := readData("data/br17.atsp")
 	compute(solveRandom, distances, "Random")
 	compute(solveHeuristic, distances, "Heuristic")
-	compute(solveGreedy, distances, "Greedy")
-	compute(solveOptimizedGreedy, distances, "optimized Greedy")
-	compute(solveSteepest, distances, "Steepest")
-	compute(solveOptimizedSteepest, distances, "optimized Steepest")
+	compute(solveReverseGreedy, distances, "Reverse Greedy")
+	compute(solveOptimizedReverseGreedy, distances, "optimized Reverse Greedy")
+	compute(solveSwapGreedy, distances, "Swap Greedy")
+	compute(solveReverseSteepest, distances, "Reverse Steepest")
+	compute(solveOptimizedReverseSteepest, distances, "optimized Reverse Steepest")
 }
 
 func compute(solve func([][]int) []int, distances [][]int, name string) {
