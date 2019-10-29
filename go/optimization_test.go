@@ -8,7 +8,7 @@ import (
 
 // test greedy optimization (COMMENT PERMUTATAION SHUFFLE BEFORE THE TEST)
 func TestGreedy(t *testing.T) {
-	distances := readData("data/br17.atsp")
+	distances := readData("../data/br17.atsp")
 	greedyResult := []int{}
 	optimizedGreedyResult := []int{}
 

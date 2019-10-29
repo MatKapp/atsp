@@ -1,8 +1,9 @@
 package main
 
-func solveReverseSteepest(distances [][]int) []int {
+func solveReverseSteepest(distances [][]int) ([]int, int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
+	stepCount := 0
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
@@ -20,9 +21,10 @@ func solveReverseSteepest(distances [][]int) []int {
 		if newResult < bestResult {
 			bestResult = newResult
 			resultImproved = true
+			stepCount++
 		}
 	}
-	return permutation
+	return permutation, stepCount
 }
 
 func solveOptimizedReverseSteepest(distances [][]int) []int {

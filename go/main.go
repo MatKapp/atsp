@@ -54,10 +54,10 @@ func main() {
 		"ft70",
 	}
 
-	gFile, greedyWriter := getWriter("results/greedy.csv")
-	sFile, steepestWriter := getWriter("results/steepest.csv")
-	hFile, heuristicWriter := getWriter("results/heuristic.csv")
-	rFile, randomWriter := getWriter("results/random.csv")
+	gFile, greedyWriter := getWriter("../results/greedy.csv")
+	sFile, steepestWriter := getWriter("../results/steepest.csv")
+	hFile, heuristicWriter := getWriter("../results/heuristic.csv")
+	rFile, randomWriter := getWriter("../results/random.csv")
 
 	defer gFile.Close()
 	defer sFile.Close()
@@ -76,7 +76,7 @@ func main() {
 	for _, filename := range instanceFilenames {
 		fmt.Println()
 		fmt.Println(filename)
-		path := "data/" + filename + ".atsp"
+		path := "../data/" + filename + ".atsp"
 		distances := readData(path)
 
 		bestKnown := bestKnownSolutions[filename]
@@ -85,14 +85,14 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		// _, gOutput := computeGS(solveHeuristic, distances, bestKnown, "Greedy")
-		// greedyWriter.Write(gOutput)
+		_, gOutput := computeGS(solveSwapGreedy, distances, bestKnown, "Greedy")
+		greedyWriter.Write(gOutput)
 
-		// steepestElapsed, sOutput := computeGS(solveHeuristic, distances, bestKnown, "Steepest")
-		// steepestWriter.Write(sOutput)
+		steepestElapsed, sOutput := computeGS(solveReverseSteepest, distances, bestKnown, "Steepest")
+		steepestWriter.Write(sOutput)
 
-		// rOutput := computeRandom(distances, steepestElapsed, bestKnown)
-		// randomWriter.Write(rOutput)
+		rOutput := computeRandom(distances, steepestElapsed, bestKnown)
+		randomWriter.Write(rOutput)
 	}
 }
 
