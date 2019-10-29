@@ -232,6 +232,29 @@ func countNeighborDistanceDifference(permutation []int, distances [][]int, start
 	return actualPartialDistance - newPartialDistance
 }
 
+func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int) int {
+	SIZE := len(perm)
+
+	if start == end {
+		return 0
+	}
+
+	actualPartialDistance := 0
+	newPartialDistance := 0
+
+	actualPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
+	actualPartialDistance += distances[perm[start]][perm[start+1]]
+	actualPartialDistance += distances[perm[end-1]][perm[end]]
+	actualPartialDistance += distances[perm[end]][perm[(end+1)%SIZE]]
+
+	newPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[end]]
+	newPartialDistance += distances[perm[end]][perm[start+1]]
+	newPartialDistance += distances[perm[end-1]][perm[start]]
+	newPartialDistance += distances[perm[start]][perm[(end+1)%SIZE]]
+
+	return actualPartialDistance - newPartialDistance
+}
+
 func countNeighborResult(permutation []int, start int, end int) int {
 	// result =
 	return 1

@@ -58,7 +58,7 @@ func findBetterSwapNeighborOptimized(permutation []int, distances [][]int) []int
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
-			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+			neighborProfit := countNeighborSwapProfit(permutation, distances, i, j)
 
 			if neighborProfit > 0 {
 				neighbor := createNeighbor(permutation, i, j)
