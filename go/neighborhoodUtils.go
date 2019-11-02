@@ -1,7 +1,8 @@
 package main
 
-func findBestSwapNeighbor(permutation []int, distances [][]int) []int {
+func findBestSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
+	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 	copy(result, permutation)
 	bestResult := getDistance(permutation, distances)
@@ -10,6 +11,7 @@ func findBestSwapNeighbor(permutation []int, distances [][]int) []int {
 		for j := 0; j < SIZE; j++ {
 			neighbor := createNeighbor(permutation, i, j)
 			newResult := getDistance(neighbor, distances)
+			reviewedSolutionsNumber++
 
 			if newResult < bestResult {
 				bestResult = newResult
@@ -17,12 +19,12 @@ func findBestSwapNeighbor(permutation []int, distances [][]int) []int {
 			}
 		}
 	}
-	return result
+	return result, reviewedSolutionsNumber
 }
 
-func findBestSwapNeighborOptimized(permutation []int, distances [][]int) []int {
+func findBestSwapNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
-
+	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 	bestNeighbor := []int{0, 0}
 	copy(result, permutation)
@@ -31,6 +33,7 @@ func findBestSwapNeighborOptimized(permutation []int, distances [][]int) []int {
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
 			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+			reviewedSolutionsNumber++
 
 			if neighborProfit > bestProfit {
 				bestProfit = neighborProfit
@@ -42,11 +45,12 @@ func findBestSwapNeighborOptimized(permutation []int, distances [][]int) []int {
 
 	copy(result, createNeighbor(permutation, bestNeighbor[0], bestNeighbor[1]))
 
-	return result
+	return result, reviewedSolutionsNumber
 }
 
-func findBestReverseNeighbor(permutation []int, distances [][]int) []int {
+func findBestReverseNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
+	reviewedSolutions := 0
 	result := makeArray(SIZE)
 	copy(result, permutation)
 	bestResult := getDistance(permutation, distances)
@@ -55,6 +59,7 @@ func findBestReverseNeighbor(permutation []int, distances [][]int) []int {
 		for j := 0; j < SIZE; j++ {
 			neighbor := createNeighbor(permutation, i, j)
 			newResult := getDistance(neighbor, distances)
+			reviewedSolutions++
 
 			if newResult < bestResult {
 				bestResult = newResult
@@ -62,11 +67,12 @@ func findBestReverseNeighbor(permutation []int, distances [][]int) []int {
 			}
 		}
 	}
-	return result
+	return result, reviewedSolutions
 }
 
-func findBestReverseNeighborOptimized(permutation []int, distances [][]int) []int {
+func findBestReverseNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
+	reviewedSolutionsNumber := 0
 
 	result := makeArray(SIZE)
 	bestNeighbor := []int{0, 0}
@@ -76,6 +82,7 @@ func findBestReverseNeighborOptimized(permutation []int, distances [][]int) []in
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
 			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+			reviewedSolutionsNumber++
 
 			if neighborProfit > bestProfit {
 				bestProfit = neighborProfit
@@ -87,29 +94,32 @@ func findBestReverseNeighborOptimized(permutation []int, distances [][]int) []in
 
 	copy(result, createNeighbor(permutation, bestNeighbor[0], bestNeighbor[1]))
 
-	return result
+	return result, reviewedSolutionsNumber
 }
 
-func findBetterSwapNeighborOptimized(permutation []int, distances [][]int) []int {
+func findBetterSwapNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
+	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
 			neighborProfit := countNeighborSwapProfit(permutation, distances, i, j)
+			reviewedSolutionsNumber++
 
 			if neighborProfit > 0 {
 				neighbor := createNeighbor(permutation, i, j)
 				copy(result, neighbor)
-				return result
+				return result, reviewedSolutionsNumber
 			}
 		}
 	}
-	return permutation
+	return permutation, reviewedSolutionsNumber
 }
 
-func findBetterSwapNeighbor(permutation []int, distances [][]int) []int {
+func findBetterSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
+	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 	copy(result, permutation)
 	oldResult := getDistance(permutation, distances)
@@ -118,36 +128,40 @@ func findBetterSwapNeighbor(permutation []int, distances [][]int) []int {
 		for j := 0; j < SIZE; j++ {
 			neighbor := tmpSwap(permutation, i, j)
 			newResult := getDistance(neighbor, distances)
+			reviewedSolutionsNumber++
 
 			if newResult < oldResult {
 				copy(result, neighbor)
-				return result
+				return result, reviewedSolutionsNumber
 			}
 		}
 	}
-	return result
+	return result, reviewedSolutionsNumber
 }
 
-func findBetterReverseNeighborOptimized(permutation []int, distances [][]int) []int {
+func findBetterReverseNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
+	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
 			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+			reviewedSolutionsNumber++
 
 			if neighborProfit > 0 {
 				neighbor := createNeighbor(permutation, i, j)
 				copy(result, neighbor)
-				return result
+				return result, reviewedSolutionsNumber
 			}
 		}
 	}
-	return permutation
+	return permutation, reviewedSolutionsNumber
 }
 
-func findBetterReverseNeighbor(permutation []int, distances [][]int) []int {
+func findBetterReverseNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
+	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 	oldResult := getDistance(permutation, distances)
 
@@ -158,11 +172,11 @@ func findBetterReverseNeighbor(permutation []int, distances [][]int) []int {
 
 			if newResult < oldResult {
 				copy(result, neighbor)
-				return result
+				return result, reviewedSolutionsNumber
 			}
 		}
 	}
-	return permutation
+	return permutation, reviewedSolutionsNumber
 }
 
 func createNeighbor(permutation []int, start int, end int) []int {

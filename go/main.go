@@ -85,26 +85,32 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, gOutput := computeGS(solveSwapGreedy, distances, bestKnown, "Greedy")
-		greedyWriter.Write(gOutput)
+		_, swapGreedyOutput := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy")
+		greedyWriter.Write(swapGreedyOutput)
+		_, reverseGreedyOutput := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy")
+		greedyWriter.Write(reverseGreedyOutput)
 
-		steepestElapsed, sOutput := computeGS(solveReverseSteepest, distances, bestKnown, "Steepest")
-		steepestWriter.Write(sOutput)
+		swapSteepestElapsed, swapSteepestOutput := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest")
+		steepestWriter.Write(swapSteepestOutput)
+		_, reverseSteepestOutput := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest")
+		steepestWriter.Write(reverseSteepestOutput)
 
-		rOutput := computeRandom(distances, steepestElapsed, bestKnown)
+		rOutput := computeRandom(distances, swapSteepestElapsed, bestKnown)
 		randomWriter.Write(rOutput)
 	}
 }
 
-func computeGS(solve func([][]int) ([]int, int), distances [][]int, bestKnown int, name string) (time.Duration, []string) {
+func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKnown int, name string) (time.Duration, []string) {
 	qualities := make([]float64, RUN_COUNT)
 	stepCounts := makeArray(RUN_COUNT)
+	reviewedSolutionsNumbers := makeArray(RUN_COUNT)
 
 	start := time.Now()
 	for i := 0; i < RUN_COUNT || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-		permutation, stepCount := solve(distances)
+		permutation, stepCount, reviewedSolutions := solve(distances)
 		if i < RUN_COUNT {
 			stepCounts[i] = stepCount
+			reviewedSolutionsNumbers[i] = reviewedSolutions
 			result := getDistance(permutation, distances)
 			qualities[i] = getQuality(result, bestKnown)
 		}
@@ -117,8 +123,9 @@ func computeGS(solve func([][]int) ([]int, int), distances [][]int, bestKnown in
 
 	stdResult := std(qualities)
 	meanSteps := meanInt(stepCounts)
+	meanReviewedSolutions := meanInt(reviewedSolutionsNumbers)
 
-	fmt.Println(name, "elapsed: ", elapsed, "best: ", bestResult, "mean: ", meanResult, "steps(mean): ", meanSteps, "std result: ", stdResult)
+	fmt.Println(name, "elapsed: ", elapsed, "best: ", bestResult, "mean: ", meanResult, "steps(mean): ", meanSteps, "std result: ", stdResult, "reviewed solutions(mean): ", meanReviewedSolutions)
 	output := []string{
 		itoa(len(distances)),
 		ftoa(bestResult),
@@ -126,6 +133,7 @@ func computeGS(solve func([][]int) ([]int, int), distances [][]int, bestKnown in
 		ftoa(meanSteps),
 		ftoa(stdResult),
 		itoa(int(elapsed.Nanoseconds())),
+		ftoa(meanReviewedSolutions),
 	}
 	return elapsed, output
 }
