@@ -15,7 +15,7 @@ func solveSwapSteepest(distances [][]int) ([]int, int) {
 
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
-		permutation = findBestNeighbor(permutation, distances)
+		permutation = findBestSwapNeighbor(permutation, distances)
 		newResult := getDistance(permutation, distances)
 
 		if newResult < bestResult {
@@ -50,49 +50,4 @@ func solveOptimizedSwapSteepest(distances [][]int) []int {
 		}
 	}
 	return permutation
-}
-
-func findBestSwapNeighbor(permutation []int, distances [][]int) []int {
-	SIZE := len(permutation)
-	result := makeArray(SIZE)
-	copy(result, permutation)
-	bestResult := getDistance(permutation, distances)
-
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
-			neighbor := createNeighbor(permutation, i, j)
-			newResult := getDistance(neighbor, distances)
-
-			if newResult < bestResult {
-				bestResult = newResult
-				copy(result, neighbor)
-			}
-		}
-	}
-	return result
-}
-
-func findBestSwapNeighborOptimized(permutation []int, distances [][]int) []int {
-	SIZE := len(permutation)
-
-	result := makeArray(SIZE)
-	bestNeighbor := []int{0, 0}
-	copy(result, permutation)
-	bestProfit := 0
-
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
-			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
-
-			if neighborProfit > bestProfit {
-				bestProfit = neighborProfit
-				bestNeighbor[0] = i
-				bestNeighbor[1] = j
-			}
-		}
-	}
-
-	copy(result, createNeighbor(permutation, bestNeighbor[0], bestNeighbor[1]))
-
-	return result
 }

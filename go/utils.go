@@ -100,7 +100,7 @@ func reversePermutationPart(perm []int, start int, end int) []int {
 	swapsNumber := (end - start) / 2
 
 	for i := 0; i < swapsNumber; i++ {
-		bitSwap(perm, start+i, end-i)
+		tmpSwap(perm, start+i, end-i)
 	}
 	return perm
 }
@@ -210,70 +210,6 @@ func std(array []float64) float64 {
 		sum += diff * diff
 	}
 	return math.Sqrt(sum / float64(len(array)))
-}
-
-func createNeighbor(permutation []int, start int, end int) []int {
-	distance := end - start
-	SIZE := len(permutation)
-	result := makeArray(SIZE)
-	copy(result, permutation)
-
-	for i := 0; i < distance/2; i++ {
-		temp := result[start+i]
-		result[start+i] = result[end-i]
-		result[end-i] = temp
-	}
-	return result
-}
-
-func countNeighborDistanceDifference(permutation []int, distances [][]int, start int, end int) int {
-	actualPartialDistance := getPartialDistance(permutation, distances, start, end)
-	newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end)
-	return actualPartialDistance - newPartialDistance
-}
-
-func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int) int {
-	SIZE := len(perm)
-
-	if start == end {
-		return 0
-	}
-
-	actualPartialDistance := 0
-	newPartialDistance := 0
-
-	actualPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
-	actualPartialDistance += distances[perm[start]][perm[start+1]]
-	actualPartialDistance += distances[perm[end-1]][perm[end]]
-	actualPartialDistance += distances[perm[end]][perm[(end+1)%SIZE]]
-
-	newPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[end]]
-	newPartialDistance += distances[perm[end]][perm[start+1]]
-	newPartialDistance += distances[perm[end-1]][perm[start]]
-	newPartialDistance += distances[perm[start]][perm[(end+1)%SIZE]]
-
-	return actualPartialDistance - newPartialDistance
-}
-
-func countNeighborResult(permutation []int, start int, end int) int {
-	// result =
-	return 1
-}
-
-func tmpSwap(permutation []int, first int, second int) []int {
-	tmp := permutation[first]
-	permutation[first] = permutation[second]
-	permutation[second] = tmp
-	return permutation
-}
-
-func bitSwap(permutation []int, first int, second int) []int {
-	if first != second {
-		permutation[first] ^= permutation[second]
-		permutation[second] ^= permutation[first]
-		permutation[first] ^= permutation[second]
-	}
-	return permutation
 }
 
 func itoa(value int) string {
