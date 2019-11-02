@@ -54,22 +54,30 @@ func main() {
 		"ft70",
 	}
 
-	gFile, greedyWriter := getWriter("../results/greedy.csv")
-	sFile, steepestWriter := getWriter("../results/steepest.csv")
+	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
+	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
+	swapSteepestFile, swapSteepestWriter := getWriter("../results/swapSteepest.csv")
+	reverseSteepestFile, reverseSteepestWriter := getWriter("../results/reverseSteepest.csv")
 	hFile, heuristicWriter := getWriter("../results/heuristic.csv")
 	rFile, randomWriter := getWriter("../results/random.csv")
 
-	defer gFile.Close()
-	defer sFile.Close()
+	defer swapGreedyFile.Close()
+	defer reverseGreedyFile.Close()
+	defer swapSteepestFile.Close()
+	defer reverseSteepestFile.Close()
 	defer hFile.Close()
 	defer rFile.Close()
-	defer greedyWriter.Flush()
-	defer steepestWriter.Flush()
+	defer swapGreedyWriter.Flush()
+	defer reverseGreedyWriter.Flush()
+	defer swapSteepestWriter.Flush()
+	defer reverseSteepestWriter.Flush()
 	defer heuristicWriter.Flush()
 	defer randomWriter.Flush()
 
-	greedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time"})
-	steepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time"})
+	swapGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
+	reverseGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
+	swapSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
+	reverseSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
 	heuristicWriter.Write([]string{"size", "best"})
 	randomWriter.Write([]string{"size", "best", "time"})
 
@@ -86,14 +94,14 @@ func main() {
 		heuristicWriter.Write(hOutput)
 
 		_, swapGreedyOutput := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy")
-		greedyWriter.Write(swapGreedyOutput)
+		swapGreedyWriter.Write(swapGreedyOutput)
 		_, reverseGreedyOutput := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy")
-		greedyWriter.Write(reverseGreedyOutput)
+		reverseGreedyWriter.Write(reverseGreedyOutput)
 
 		swapSteepestElapsed, swapSteepestOutput := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest")
-		steepestWriter.Write(swapSteepestOutput)
+		swapSteepestWriter.Write(swapSteepestOutput)
 		_, reverseSteepestOutput := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest")
-		steepestWriter.Write(reverseSteepestOutput)
+		reverseSteepestWriter.Write(reverseSteepestOutput)
 
 		rOutput := computeRandom(distances, swapSteepestElapsed, bestKnown)
 		randomWriter.Write(rOutput)

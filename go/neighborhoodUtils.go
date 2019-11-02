@@ -169,6 +169,7 @@ func findBetterReverseNeighbor(permutation []int, distances [][]int) ([]int, int
 		for j := 0; j < SIZE; j++ {
 			neighbor := createNeighbor(permutation, i, j)
 			newResult := getDistance(neighbor, distances)
+			reviewedSolutionsNumber++
 
 			if newResult < oldResult {
 				copy(result, neighbor)
