@@ -10,7 +10,10 @@ import (
 type fn func([][]int) ([]int, int)
 
 const MIN_TIME = 1000 * 1000
-const RUN_COUNT = 10
+const DEFAULT_RUN_COUNT = 10
+const STEP_RUN_COUNT = 400
+const GS_COUNT_STEPS = 10
+const STEP = STEP_RUN_COUNT / GS_COUNT_STEPS
 
 func main() {
 	bestKnownSolutions := map[string]int{
@@ -54,12 +57,16 @@ func main() {
 		"ft70",
 	}
 
+	stepProcessingInstanceFilename := "ftv55"
+
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
 	swapSteepestFile, swapSteepestWriter := getWriter("../results/swapSteepest.csv")
 	reverseSteepestFile, reverseSteepestWriter := getWriter("../results/reverseSteepest.csv")
 	hFile, heuristicWriter := getWriter("../results/heuristic.csv")
 	rFile, randomWriter := getWriter("../results/random.csv")
+	stepMeanProcessingFile, stepMeanProcessingWriter := getWriter("../results/stepMeanProcessing-" + stepProcessingInstanceFilename + ".csv")
+	stepBestProcessingFile, stepBestProcessingWriter := getWriter("../results/stepBestProcessing-" + stepProcessingInstanceFilename + ".csv")
 
 	defer swapGreedyFile.Close()
 	defer reverseGreedyFile.Close()
@@ -67,19 +74,25 @@ func main() {
 	defer reverseSteepestFile.Close()
 	defer hFile.Close()
 	defer rFile.Close()
+	defer stepMeanProcessingFile.Close()
+	defer stepBestProcessingFile.Close()
 	defer swapGreedyWriter.Flush()
 	defer reverseGreedyWriter.Flush()
 	defer swapSteepestWriter.Flush()
 	defer reverseSteepestWriter.Flush()
 	defer heuristicWriter.Flush()
 	defer randomWriter.Flush()
+	defer stepMeanProcessingWriter.Flush()
+	defer stepBestProcessingWriter.Flush()
 
-	swapGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
-	reverseGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
-	swapSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
-	reverseSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewedSolutions"})
+	swapGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
+	reverseGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
+	swapSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
+	reverseSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
 	heuristicWriter.Write([]string{"size", "best"})
 	randomWriter.Write([]string{"size", "best", "time"})
+	stepMeanProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
+	stepBestProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 
 	for _, filename := range instanceFilenames {
 		fmt.Println()
@@ -87,20 +100,39 @@ func main() {
 		path := "../data/" + filename + ".atsp"
 		distances := readData(path)
 
+		stepProcessing := false
+
+		if filename == stepProcessingInstanceFilename {
+			stepProcessing = true
+		}
+
+		println(stepProcessing)
+
 		bestKnown := bestKnownSolutions[filename]
 		fmt.Println("Best known: ", bestKnown)
 
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy")
+		_, swapGreedyOutput, meanResult, bestResult := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
+
+		if stepProcessing {
+			for index, element := range meanResult {
+				stepMeanProcessingWriter.Write([]string{itoa(index), itoa(STEP * index), ftoa(element)})
+			}
+
+			for index, element := range bestResult {
+				stepBestProcessingWriter.Write([]string{itoa(index), itoa(STEP * index), ftoa(element)})
+			}
+		}
+
 		swapGreedyWriter.Write(swapGreedyOutput)
-		_, reverseGreedyOutput := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy")
+		_, reverseGreedyOutput, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
 		reverseGreedyWriter.Write(reverseGreedyOutput)
 
-		swapSteepestElapsed, swapSteepestOutput := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest")
+		swapSteepestElapsed, swapSteepestOutput, _, _ := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest", false)
 		swapSteepestWriter.Write(swapSteepestOutput)
-		_, reverseSteepestOutput := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest")
+		_, reverseSteepestOutput, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
 		reverseSteepestWriter.Write(reverseSteepestOutput)
 
 		rOutput := computeRandom(distances, swapSteepestElapsed, bestKnown)
@@ -108,21 +140,55 @@ func main() {
 	}
 }
 
-func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKnown int, name string) (time.Duration, []string) {
-	qualities := make([]float64, RUN_COUNT)
-	stepCounts := makeArray(RUN_COUNT)
-	reviewedSolutionsNumbers := makeArray(RUN_COUNT)
+func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64) {
 
+	runCount := DEFAULT_RUN_COUNT
+
+	if stepProcessing {
+		runCount = STEP_RUN_COUNT
+	}
+
+	qualities := make([]float64, runCount)
+	stepCounts := makeArray(runCount)
+	reviewedSolutionsNumbers := makeArray(runCount)
 	start := time.Now()
-	for i := 0; i < RUN_COUNT || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-		permutation, stepCount, reviewedSolutions := solve(distances)
-		if i < RUN_COUNT {
-			stepCounts[i] = stepCount
-			reviewedSolutionsNumbers[i] = reviewedSolutions
-			result := getDistance(permutation, distances)
-			qualities[i] = getQuality(result, bestKnown)
+	meanResultsAfterStep := make([]float64, GS_COUNT_STEPS)
+	bestResultsAfterStep := make([]float64, GS_COUNT_STEPS)
+
+	if stepProcessing {
+
+		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
+			permutation, stepCount, reviewedSolutions := solve(distances)
+
+			if i < runCount {
+				if i%STEP == 0 {
+					if i == 0 {
+						meanResultsAfterStep[i/STEP] = 0
+						bestResultsAfterStep[i/STEP] = 0
+					} else {
+						meanResultsAfterStep[i/STEP] = mean(qualities[0:i])
+						bestResultsAfterStep[i/STEP] = minOfArray(qualities[0:i])
+					}
+				}
+				stepCounts[i] = stepCount
+				reviewedSolutionsNumbers[i] = reviewedSolutions
+				result := getDistance(permutation, distances)
+				qualities[i] = getQuality(result, bestKnown)
+			}
+		}
+	} else {
+		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
+			permutation, stepCount, reviewedSolutions := solve(distances)
+
+			if i < runCount {
+				stepCounts[i] = stepCount
+				reviewedSolutionsNumbers[i] = reviewedSolutions
+				result := getDistance(permutation, distances)
+				qualities[i] = getQuality(result, bestKnown)
+			}
 		}
 	}
+
 	elapsed := time.Since(start)
 	bestResult := minOfArray(qualities)
 	fmt.Println(bestResult, qualities)
@@ -142,8 +208,9 @@ func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKno
 		ftoa(stdResult),
 		itoa(int(elapsed.Nanoseconds())),
 		ftoa(meanReviewedSolutions),
+		ftoa(meanResult / float64(elapsed.Milliseconds())),
 	}
-	return elapsed, output
+	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep
 }
 
 func computeHeuristic(distances [][]int, bestKnown int) []string {

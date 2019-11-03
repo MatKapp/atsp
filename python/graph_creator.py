@@ -30,10 +30,15 @@ def draw_for_files(files, x_label, y_label, e_label=None):
 
 
 if __name__ == '__main__':
-    gs_files = ['greedy', 'steepest']
-    gsr_files = gs_files + ['random']
+    swap_gs_files = ['swapGreedy', 'swapSteepest']
+    all_gs_files = swap_gs_files + ['reverseGreedy', 'reverseSteepest']
+    gsr_files = swap_gs_files + ['random']
     gsrh_files = gsr_files + ['heuristic']
     draw_for_files(gsrh_files, 'size', 'best')
+    draw_for_files(all_gs_files, 'size', 'best')
     draw_for_files(gsr_files, 'size', 'time')
-    draw_for_files(gs_files, 'size', 'mean', 'std')
-    draw_for_files(gs_files, 'size', 'mean_steps')
+    draw_for_files(swap_gs_files, 'size', 'mean', 'std')
+    draw_for_files(swap_gs_files, 'size', 'mean_steps')
+    draw_for_files(all_gs_files, 'size', 'mean_steps')
+    draw_for_files(all_gs_files, 'size', 'reviewed_solutions')
+    draw_for_files(all_gs_files, 'size', 'quality_time')
