@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"testing"
 )
 
@@ -103,5 +104,25 @@ func TestCountNeighborSwapProfit(t *testing.T) {
 
 	if profit != 5 {
 		t.Error("Profit error")
+	}
+}
+
+func TestSimilarity(t *testing.T) {
+	a := []int{1, 2, 3, 4, 5, 6, 7}
+	b := []int{7, 6, 5, 4, 3, 2, 1}
+
+	result := countSimilarity(a, b)
+
+	if result != 0 {
+		t.Error("Similarity failed")
+	}
+
+	a = []int{1, 2, 3, 4, 5, 7, 6}
+	b = []int{7, 6, 5, 4, 3, 2, 1}
+
+	result = countSimilarity(a, b)
+
+	if math.Round(result*100)/100 != math.Round(1/7.0*100)/100 {
+		t.Error("Similarity failed")
 	}
 }
