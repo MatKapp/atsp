@@ -1,10 +1,11 @@
 package main
 
-func solveReverseGreedy(distances [][]int) ([]int, int, int) {
+func solveReverseGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
+	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
@@ -26,14 +27,15 @@ func solveReverseGreedy(distances [][]int) ([]int, int, int) {
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber
+	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
 }
 
-func solveOptimizedReverseGreedy(distances [][]int) ([]int, int, int) {
+func solveOptimizedReverseGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
+	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
@@ -55,5 +57,5 @@ func solveOptimizedReverseGreedy(distances [][]int) ([]int, int, int) {
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber
+	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
 }

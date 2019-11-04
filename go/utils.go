@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -222,4 +223,45 @@ func ftoa(value float64) string {
 
 func getQuality(result int, bestKnown int) float64 {
 	return float64(result) / float64(bestKnown)
+}
+
+func getPairSubarrays(array []int) [][]int {
+	SIZE := len(array)
+	var result [][]int
+
+	for i := SIZE - 2; i > 0; i-- {
+		result = append(result, []int{array[i], array[(i + 1)]})
+	}
+
+	result = append(result, ([]int{array[SIZE-1], array[0]}))
+
+	return result
+}
+
+func countSimilarity(array1, arary2 []int) float64 {
+	pairs1 := getPairSubarrays(array1)
+	pairs2 := getPairSubarrays(arary2)
+	intersection := intersectionHash(pairs1, pairs2)
+	return float64(len(array1)) / float64(len(intersection))
+}
+
+func intersectionHash(a interface{}, b interface{}) []interface{} {
+	set := make([]interface{}, 0)
+	hash := make(map[interface{}]bool)
+	av := reflect.ValueOf(a)
+	bv := reflect.ValueOf(b)
+
+	for i := 0; i < av.Len(); i++ {
+		el := av.Index(i).Interface()
+		hash[el] = true
+	}
+
+	for i := 0; i < bv.Len(); i++ {
+		el := bv.Index(i).Interface()
+		if _, found := hash[el]; found {
+			set = append(set, el)
+		}
+	}
+
+	return set
 }

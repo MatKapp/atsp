@@ -1,15 +1,16 @@
 package main
 
-func solveSwapGreedy(distances [][]int) ([]int, int, int) {
+func solveSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
+	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	// permutation = shuffle(permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -26,19 +27,20 @@ func solveSwapGreedy(distances [][]int) ([]int, int, int) {
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber
+	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
 }
 
-func solveOptimizedSwapGreedy(distances [][]int) ([]int, int, int) {
+func solveOptimizedSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
+	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	// permutation = shuffle(permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -55,5 +57,5 @@ func solveOptimizedSwapGreedy(distances [][]int) ([]int, int, int) {
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber
+	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
 }

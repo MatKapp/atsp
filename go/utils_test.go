@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -68,12 +69,39 @@ func TestSwap(t *testing.T) {
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
-			swapped1 = tmpSwap(swapped1, i, j)
+			tmpSwap(swapped1, i, j)
 			swapped2 = bitSwap(swapped2, i, j)
 
 			if !areSlicesEqual(swapped1, swapped2) {
 				t.Error("swapped values are different")
 			}
 		}
+	}
+}
+
+func TestCountNeighborSwapProfit(t *testing.T) {
+	distances := [][]int{
+		{0, 1, 2, 3},
+		{4, 5, 6, 7},
+		{8, 9, 8, 7},
+		{6, 5, 6, 7},
+	}
+	perm := []int{0, 2, 1, 3}
+	SIZE := len(perm)
+
+	profit := countNeighborSwapProfit(perm, distances, 0, 2, SIZE) // (9 + 7 + 6 + 2) - (5 + 6 + 8 + 3) = 24 - 22 = 2
+
+	fmt.Println(profit)
+
+	if profit != 2 {
+		t.Error("Profit error")
+	}
+
+	profit = countNeighborSwapProfit(perm, distances, 0, 3, SIZE) // (7 + 6 + 6 + 2) - (3 + 6 + 4 + 3) = 21 - 16 = 5
+
+	fmt.Println(profit)
+
+	if profit != 5 {
+		t.Error("Profit error")
 	}
 }

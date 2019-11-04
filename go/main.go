@@ -12,6 +12,7 @@ type fn func([][]int) ([]int, int)
 const MIN_TIME = 1000 * 1000
 const DEFAULT_RUN_COUNT = 10
 const STEP_RUN_COUNT = 400
+const SIMILARITY_STEP = 3
 const GS_COUNT_STEPS = 10
 const STEP = STEP_RUN_COUNT / GS_COUNT_STEPS
 
@@ -114,7 +115,7 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput, meanResult, bestResult := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
+		_, swapGreedyOutput, meanResult, bestResult, _ := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
 
 		if stepProcessing {
 			for index, element := range meanResult {
@@ -127,12 +128,12 @@ func main() {
 		}
 
 		swapGreedyWriter.Write(swapGreedyOutput)
-		_, reverseGreedyOutput, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
+		_, reverseGreedyOutput, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
 		reverseGreedyWriter.Write(reverseGreedyOutput)
 
-		swapSteepestElapsed, swapSteepestOutput, _, _ := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest", false)
+		swapSteepestElapsed, swapSteepestOutput, _, _, _ := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest", false)
 		swapSteepestWriter.Write(swapSteepestOutput)
-		_, reverseSteepestOutput, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
+		_, reverseSteepestOutput, _, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
 		reverseSteepestWriter.Write(reverseSteepestOutput)
 
 		rOutput := computeRandom(distances, swapSteepestElapsed, bestKnown)
@@ -140,7 +141,7 @@ func main() {
 	}
 }
 
-func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64) {
+func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int) {
 
 	runCount := DEFAULT_RUN_COUNT
 
@@ -154,11 +155,13 @@ func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKno
 	start := time.Now()
 	meanResultsAfterStep := make([]float64, GS_COUNT_STEPS)
 	bestResultsAfterStep := make([]float64, GS_COUNT_STEPS)
+	var stepPermutationsResult [][]int
 
 	if stepProcessing {
 
 		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-			permutation, stepCount, reviewedSolutions := solve(distances)
+			permutation, stepCount, reviewedSolutions, stepPermutations := solve(distances, stepProcessing)
+			stepPermutationsResult = stepPermutations
 
 			if i < runCount {
 				if i%STEP == 0 {
@@ -178,7 +181,8 @@ func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKno
 		}
 	} else {
 		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-			permutation, stepCount, reviewedSolutions := solve(distances)
+			permutation, stepCount, reviewedSolutions, stepPermutations := solve(distances, stepProcessing)
+			stepPermutationsResult = stepPermutations
 
 			if i < runCount {
 				stepCounts[i] = stepCount
@@ -210,7 +214,7 @@ func computeGS(solve func([][]int) ([]int, int, int), distances [][]int, bestKno
 		ftoa(meanReviewedSolutions),
 		ftoa(meanResult / float64(elapsed.Milliseconds())),
 	}
-	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep
+	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep, stepPermutationsResult
 }
 
 func computeHeuristic(distances [][]int, bestKnown int) []string {

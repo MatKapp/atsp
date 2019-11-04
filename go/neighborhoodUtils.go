@@ -7,16 +7,17 @@ func findBestSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	copy(result, permutation)
 	bestResult := getDistance(permutation, distances)
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
-			neighbor := createNeighbor(permutation, i, j)
-			newResult := getDistance(neighbor, distances)
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
+			tmpSwap(permutation, i, j)
+			newResult := getDistance(permutation, distances)
 			reviewedSolutionsNumber++
 
 			if newResult < bestResult {
 				bestResult = newResult
-				copy(result, neighbor)
+				copy(result, permutation)
 			}
+			tmpSwap(permutation, i, j)
 		}
 	}
 	return result, reviewedSolutionsNumber
@@ -30,9 +31,9 @@ func findBestSwapNeighborOptimized(permutation []int, distances [][]int) ([]int,
 	copy(result, permutation)
 	bestProfit := 0
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
-			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
+			neighborProfit := countNeighborSwapProfit(permutation, distances, i, j, SIZE)
 			reviewedSolutionsNumber++
 
 			if neighborProfit > bestProfit {
@@ -43,7 +44,7 @@ func findBestSwapNeighborOptimized(permutation []int, distances [][]int) ([]int,
 		}
 	}
 
-	copy(result, createNeighbor(permutation, bestNeighbor[0], bestNeighbor[1]))
+	copy(result, tmpSwap(permutation, bestNeighbor[0], bestNeighbor[1]))
 
 	return result, reviewedSolutionsNumber
 }
@@ -100,17 +101,16 @@ func findBestReverseNeighborOptimized(permutation []int, distances [][]int) ([]i
 func findBetterSwapNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
 	reviewedSolutionsNumber := 0
-	result := makeArray(SIZE)
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
-			neighborProfit := countNeighborSwapProfit(permutation, distances, i, j)
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
+			neighborProfit := countNeighborSwapProfit(permutation, distances, i, j, SIZE)
 			reviewedSolutionsNumber++
 
 			if neighborProfit > 0 {
-				neighbor := createNeighbor(permutation, i, j)
-				copy(result, neighbor)
-				return result, reviewedSolutionsNumber
+				tmpSwap(permutation, i, j)
+				// neighbor := createNeighbor(permutation, i, j)
+				return permutation, reviewedSolutionsNumber
 			}
 		}
 	}
@@ -124,16 +124,17 @@ func findBetterSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	copy(result, permutation)
 	oldResult := getDistance(permutation, distances)
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
-			neighbor := tmpSwap(permutation, i, j)
-			newResult := getDistance(neighbor, distances)
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
+			tmpSwap(permutation, i, j)
+			newResult := getDistance(permutation, distances)
 			reviewedSolutionsNumber++
 
 			if newResult < oldResult {
-				copy(result, neighbor)
+				copy(result, permutation)
 				return result, reviewedSolutionsNumber
 			}
+			tmpSwap(permutation, i, j)
 		}
 	}
 	return result, reviewedSolutionsNumber
@@ -200,8 +201,7 @@ func countNeighborDistanceDifference(permutation []int, distances [][]int, start
 	return actualPartialDistance - newPartialDistance
 }
 
-func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int) int {
-	SIZE := len(perm)
+func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int, SIZE int) int {
 
 	if start == end {
 		return 0
@@ -215,10 +215,14 @@ func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int) 
 	actualPartialDistance += distances[perm[end-1]][perm[end]]
 	actualPartialDistance += distances[perm[end]][perm[(end+1)%SIZE]]
 
-	newPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[end]]
-	newPartialDistance += distances[perm[end]][perm[start+1]]
-	newPartialDistance += distances[perm[end-1]][perm[start]]
-	newPartialDistance += distances[perm[start]][perm[(end+1)%SIZE]]
+	perm = tmpSwap(perm, start, end)
+
+	newPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
+	newPartialDistance += distances[perm[start]][perm[start+1]]
+	newPartialDistance += distances[perm[end-1]][perm[end]]
+	newPartialDistance += distances[perm[end]][perm[(end+1)%SIZE]]
+
+	perm = tmpSwap(perm, start, end)
 
 	return actualPartialDistance - newPartialDistance
 }
