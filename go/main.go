@@ -115,7 +115,7 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput, meanResult, bestResult, _ := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
+		_, swapGreedyOutput, meanResult, bestResult, _ := computeGS(solveOptimizedSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
 
 		if stepProcessing {
 			for index, element := range meanResult {

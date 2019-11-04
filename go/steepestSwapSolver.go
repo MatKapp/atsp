@@ -40,24 +40,21 @@ func solveOptimizedSwapSteepest(distances [][]int, stepProcessing bool) ([]int, 
 	stepCount := 0
 	reviewedSolutionsNumber := 0
 	reviewedNeighborSolutions := 0
-	newResult := 0
+	bestProfit := 0
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
 	// permutation = shuffle(permutation)
 
-	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
-		permutation, reviewedNeighborSolutions = findBestSwapNeighborOptimized(permutation, distances)
+		permutation, reviewedNeighborSolutions, bestProfit = findBestSwapNeighborOptimized(permutation, distances, SIZE)
 		reviewedSolutionsNumber += reviewedNeighborSolutions
-		newResult = getDistance(permutation, distances)
 
-		if newResult < bestResult {
-			bestResult = newResult
+		if bestProfit > 0 {
 			resultImproved = true
 			stepCount++
 		}

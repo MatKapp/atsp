@@ -39,7 +39,7 @@ func TestBestSwapNeighborOptimized(t *testing.T) {
 	distances := readData("../data/br17.atsp")
 	perm := []int{10, 7, 8, 16, 0, 11, 14, 3, 4, 5, 6, 2, 13, 12, 1, 9, 15}
 	result, _ := findBestSwapNeighbor(perm, distances)
-	resultOptimized, _ := findBestSwapNeighborOptimized(perm, distances)
+	resultOptimized, _, _ := findBestSwapNeighborOptimized(perm, distances, len(perm))
 
 	fmt.Println(result)
 	fmt.Println(resultOptimized)
@@ -57,15 +57,15 @@ func TestSteepest(t *testing.T) {
 
 	start := time.Now()
 
-	for i := 0; i <= 10000; i++ {
+	for i := 0; i <= 100000; i++ {
 		steepestResult, _, _, _ = solveSwapSteepest(distances, false)
 	}
 	elapsed := time.Since(start)
 	fmt.Println(steepestResult)
-	log.Printf("greedy took %s", elapsed)
+	log.Printf("steepest took %s", elapsed)
 
 	start = time.Now()
-	for i := 0; i <= 10000; i++ {
+	for i := 0; i <= 100000; i++ {
 		optimizedSteepestResult, _, _ = solveOptimizedSwapSteepest(distances, false)
 	}
 	fmt.Println(optimizedSteepestResult)

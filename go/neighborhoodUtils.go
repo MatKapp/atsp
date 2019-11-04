@@ -23,30 +23,29 @@ func findBestSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	return result, reviewedSolutionsNumber
 }
 
-func findBestSwapNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
-	SIZE := len(permutation)
+func findBestSwapNeighborOptimized(permutation []int, distances [][]int, SIZE int) ([]int, int, int) {
 	reviewedSolutionsNumber := 0
-	result := makeArray(SIZE)
-	bestNeighbor := []int{0, 0}
-	copy(result, permutation)
+	neighborI := 0
+	neighborJ := 0
 	bestProfit := 0
+	neighborProfit := 0
 
 	for i := 0; i < SIZE-1; i++ {
 		for j := i + 1; j < SIZE; j++ {
-			neighborProfit := countNeighborSwapProfit(permutation, distances, i, j, SIZE)
+			neighborProfit = countNeighborSwapProfit(permutation, distances, i, j, SIZE)
 			reviewedSolutionsNumber++
 
 			if neighborProfit > bestProfit {
 				bestProfit = neighborProfit
-				bestNeighbor[0] = i
-				bestNeighbor[1] = j
+				neighborI = i
+				neighborJ = j
 			}
 		}
 	}
 
-	copy(result, tmpSwap(permutation, bestNeighbor[0], bestNeighbor[1]))
+	tmpSwap(permutation, neighborI, neighborJ)
 
-	return result, reviewedSolutionsNumber
+	return permutation, reviewedSolutionsNumber, bestProfit
 }
 
 func findBestReverseNeighbor(permutation []int, distances [][]int) ([]int, int) {
