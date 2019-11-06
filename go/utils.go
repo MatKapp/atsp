@@ -176,6 +176,24 @@ func maxOfArray(array []int) int {
 	return maxValue
 }
 
+func minFloatOfArray(array []float64) (float64, int) {
+	minValue := 0.0
+	index := 0
+
+	for i, val := range array {
+		if isSmaller(val, minValue) {
+			minValue = val
+			index = i
+		}
+	}
+	return minValue, index
+}
+
+func isSmaller(a, b float64) bool {
+	multiplier := 100.0
+	return math.Round(a*multiplier)/multiplier < math.Round(b*multiplier)/multiplier
+}
+
 func minOfArray(array []float64) float64 {
 	minValue := math.MaxFloat64
 	for _, val := range array {

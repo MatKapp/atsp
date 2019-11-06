@@ -41,10 +41,10 @@ def draw_for_files(files, x_label, y_label, e_label=None):
     graph_path = path.join('..', 'graphs', f'{data_file_name}{x_label}_{y_label}.png')
     plt.savefig(graph_path)
 
-def draw_step_processing_graphs(files_name_prefix):
-    onlyfiles = [f for f in listdir(path.join('..', 'results')) if path.isfile(path.join(path.join('..', 'results'), f))]
-    step_results = filter(lambda x: x.startswith(files_name_prefix), onlyfiles)
-    draw_for_files(step_results, 'iteration_num', 'quality')
+def draw_for_prefixed_files(files_name_prefix, x_label, y_label):
+    only_files = [f for f in listdir(path.join('..', 'results')) if path.isfile(path.join(path.join('..', 'results'), f))]
+    filtered_files = filter(lambda x: x.startswith(files_name_prefix), only_files)
+    draw_for_files(filtered_files, x_label, y_label)
 
 def extract_data_file_name(fileName):
     return re.findall(r'(?<=-)[^.\s]*|$', fileName)[0]
@@ -52,6 +52,7 @@ def extract_data_file_name(fileName):
 if __name__ == '__main__':
     swap_gs_files = ['swapGreedy', 'swapSteepest']
     step_processing_prefix = "step"
+    similiarity_files_prefix = "similarity"
     all_gs_files = swap_gs_files + ['reverseGreedy', 'reverseSteepest']
     gsr_files = swap_gs_files + ['random']
     gsrh_files = gsr_files + ['heuristic']
@@ -64,4 +65,5 @@ if __name__ == '__main__':
     draw_for_files(all_gs_files, 'size', 'reviewed_solutions')
     draw_for_files(all_gs_files, 'size', 'quality_time')
 
-    draw_step_processing_graphs(step_processing_prefix)
+    draw_for_prefixed_files(step_processing_prefix, 'iteration_num', 'quality')
+    draw_for_prefixed_files(similiarity_files_prefix, 'quality', 'similarity')

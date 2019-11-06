@@ -12,7 +12,6 @@ type fn func([][]int) ([]int, int)
 const MIN_TIME = 1000 * 1000
 const DEFAULT_RUN_COUNT = 10
 const STEP_RUN_COUNT = 400
-const SIMILARITY_STEP = 3
 const GS_COUNT_STEPS = 10
 const STEP = STEP_RUN_COUNT / GS_COUNT_STEPS
 
@@ -68,6 +67,7 @@ func main() {
 	rFile, randomWriter := getWriter("../results/random.csv")
 	stepMeanProcessingFile, stepMeanProcessingWriter := getWriter("../results/stepMeanProcessing-" + stepProcessingInstanceFilename + ".csv")
 	stepBestProcessingFile, stepBestProcessingWriter := getWriter("../results/stepBestProcessing-" + stepProcessingInstanceFilename + ".csv")
+	stepSimilarityFile, stepSimilarityWriter := getWriter("../results/similarity-" + stepProcessingInstanceFilename + ".csv")
 
 	defer swapGreedyFile.Close()
 	defer reverseGreedyFile.Close()
@@ -77,6 +77,7 @@ func main() {
 	defer rFile.Close()
 	defer stepMeanProcessingFile.Close()
 	defer stepBestProcessingFile.Close()
+	defer stepSimilarityFile.Close()
 	defer swapGreedyWriter.Flush()
 	defer reverseGreedyWriter.Flush()
 	defer swapSteepestWriter.Flush()
@@ -85,6 +86,7 @@ func main() {
 	defer randomWriter.Flush()
 	defer stepMeanProcessingWriter.Flush()
 	defer stepBestProcessingWriter.Flush()
+	defer stepSimilarityWriter.Flush()
 
 	swapGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
 	reverseGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
@@ -94,6 +96,7 @@ func main() {
 	randomWriter.Write([]string{"size", "best", "time"})
 	stepMeanProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 	stepBestProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
+	stepSimilarityWriter.Write([]string{"step", "quality", "similarity"})
 
 	for _, filename := range instanceFilenames {
 		fmt.Println()
@@ -115,25 +118,32 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput, meanResult, bestResult, _ := computeGS(solveOptimizedSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
+		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities := computeGS(solveOptimizedSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
 
 		if stepProcessing {
 			for index, element := range meanResult {
-				stepMeanProcessingWriter.Write([]string{itoa(index), itoa(STEP * index), ftoa(element)})
+				stepMeanProcessingWriter.Write([]string{itoa(index), itoa(STEP * (index + 1)), ftoa(element)})
 			}
 
 			for index, element := range bestResult {
-				stepBestProcessingWriter.Write([]string{itoa(index), itoa(STEP * index), ftoa(element)})
+				stepBestProcessingWriter.Write([]string{itoa(index), itoa(STEP * (index + 1)), ftoa(element)})
+			}
+
+			_, indexOfMin := minFloatOfArray(qualities)
+			bestPermutation := stepPermutations[indexOfMin]
+
+			for index, element := range stepPermutations {
+				stepSimilarityWriter.Write([]string{itoa(index), ftoa(qualities[index]), ftoa(countSimilarity(element, bestPermutation))})
 			}
 		}
 
 		swapGreedyWriter.Write(swapGreedyOutput)
-		_, reverseGreedyOutput, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
+		_, reverseGreedyOutput, _, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
 		reverseGreedyWriter.Write(reverseGreedyOutput)
 
-		swapSteepestElapsed, swapSteepestOutput, _, _, _ := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest", false)
+		swapSteepestElapsed, swapSteepestOutput, _, _, _, _ := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest", false)
 		swapSteepestWriter.Write(swapSteepestOutput)
-		_, reverseSteepestOutput, _, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
+		_, reverseSteepestOutput, _, _, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
 		reverseSteepestWriter.Write(reverseSteepestOutput)
 
 		rOutput := computeRandom(distances, swapSteepestElapsed, bestKnown)
@@ -141,7 +151,7 @@ func main() {
 	}
 }
 
-func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int) {
+func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64) {
 
 	runCount := DEFAULT_RUN_COUNT
 
@@ -153,26 +163,22 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 	stepCounts := makeArray(runCount)
 	reviewedSolutionsNumbers := makeArray(runCount)
 	start := time.Now()
-	meanResultsAfterStep := make([]float64, GS_COUNT_STEPS)
-	bestResultsAfterStep := make([]float64, GS_COUNT_STEPS)
+	meanResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
+	bestResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
 	var stepPermutationsResult [][]int
 
 	if stepProcessing {
 
 		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-			permutation, stepCount, reviewedSolutions, stepPermutations := solve(distances, stepProcessing)
-			stepPermutationsResult = stepPermutations
-
+			permutation, stepCount, reviewedSolutions, _ := solve(distances, stepProcessing)
 			if i < runCount {
 				if i%STEP == 0 {
-					if i == 0 {
-						meanResultsAfterStep[i/STEP] = 0
-						bestResultsAfterStep[i/STEP] = 0
-					} else {
-						meanResultsAfterStep[i/STEP] = mean(qualities[0:i])
-						bestResultsAfterStep[i/STEP] = minOfArray(qualities[0:i])
+					if i > 0 {
+						meanResultsAfterStep[(i/STEP)-1] = mean(qualities[0:i])
+						bestResultsAfterStep[(i/STEP)-1] = minOfArray(qualities[0:i])
 					}
 				}
+				stepPermutationsResult = append(stepPermutationsResult, permutation)
 				stepCounts[i] = stepCount
 				reviewedSolutionsNumbers[i] = reviewedSolutions
 				result := getDistance(permutation, distances)
@@ -181,8 +187,7 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 		}
 	} else {
 		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-			permutation, stepCount, reviewedSolutions, stepPermutations := solve(distances, stepProcessing)
-			stepPermutationsResult = stepPermutations
+			permutation, stepCount, reviewedSolutions, _ := solve(distances, stepProcessing)
 
 			if i < runCount {
 				stepCounts[i] = stepCount
@@ -214,7 +219,7 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 		ftoa(meanReviewedSolutions),
 		ftoa(meanResult / float64(elapsed.Milliseconds())),
 	}
-	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep, stepPermutationsResult
+	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep, stepPermutationsResult, qualities
 }
 
 func computeHeuristic(distances [][]int, bestKnown int) []string {
