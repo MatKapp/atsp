@@ -10,7 +10,7 @@ func solveSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	// permutation = shuffle(permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -40,38 +40,25 @@ func solveOptimizedSwapGreedy(distances [][]int, stepProcessing bool) ([]int, in
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	// permutation = shuffle(permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
-	if stepProcessing {
-		for ok := true; ok; ok = resultImproved {
-			resultImproved = false
-			reviewedNeighborSolutions := 0
-			permutation, reviewedNeighborSolutions = findBetterSwapNeighborOptimized(permutation, distances)
+	for ok := true; ok; ok = resultImproved {
+		resultImproved = false
+		reviewedNeighborSolutions := 0
+		permutation, reviewedNeighborSolutions = findBetterSwapNeighborOptimized(permutation, distances, SIZE)
+		if stepProcessing {
 			stepPermutations = append(stepPermutations, permutation)
-			reviewedSolutionsNumber += reviewedNeighborSolutions
-			newResult := getDistance(permutation, distances)
-
-			if newResult < bestResult {
-				bestResult = newResult
-				resultImproved = true
-				stepCount++
-			}
 		}
-	} else {
-		for ok := true; ok; ok = resultImproved {
-			resultImproved = false
-			reviewedNeighborSolutions := 0
-			permutation, reviewedNeighborSolutions = findBetterSwapNeighborOptimized(permutation, distances)
-			reviewedSolutionsNumber += reviewedNeighborSolutions
-			newResult := getDistance(permutation, distances)
 
-			if newResult < bestResult {
-				bestResult = newResult
-				resultImproved = true
-				stepCount++
-			}
+		reviewedSolutionsNumber += reviewedNeighborSolutions
+		newResult := getDistance(permutation, distances)
+
+		if newResult < bestResult {
+			bestResult = newResult
+			resultImproved = true
+			stepCount++
 		}
 	}
 

@@ -260,9 +260,6 @@ func countSimilarity(array1, arary2 []int) float64 {
 	pairs1 := getPairStrings(array1)
 	pairs2 := getPairStrings(arary2)
 
-	fmt.Println(pairs1)
-	fmt.Println(pairs2)
-
 	intersection := intersectionHash(pairs1, pairs2)
 	return float64(len(intersection)) / float64(len(array1))
 }

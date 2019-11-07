@@ -16,48 +16,10 @@ const GS_COUNT_STEPS = 10
 const STEP = STEP_RUN_COUNT / GS_COUNT_STEPS
 
 func main() {
-	bestKnownSolutions := map[string]int{
-		"br17":   39,
-		"ft53":   6905,
-		"ftv33":  1286,
-		"ft70":   38673,
-		"ftv35":  1473,
-		"ftv44":  1613,
-		"ftv38":  1530,
-		"ftv55":  1608,
-		"ftv47":  1776,
-		"ftv64":  1839,
-		"ftv70":  1950,
-		"ftv100": 1788,
-		"ftv110": 1958,
-		"ftv90":  1579,
-		"ftv120": 2166,
-		"ftv130": 2307,
-		"ftv140": 2420,
-		"ftv150": 2611,
-		"ftv170": 2755,
-		"ftv160": 2683,
-		"kro124": 36230,
-		"p43":    5620,
-		"rbg358": 1163,
-		"rbg323": 1326,
-		"rbg403": 2465,
-		"rbg443": 2720,
-		"ry48p":  14422,
-	}
-	instanceFilenames := []string{
-		"br17",
-		"ftv33",
-		"ftv35",
-		"ftv38",
-		"ftv44",
-		"ftv47",
-		"ft53",
-		"ftv55",
-		"ft70",
-	}
+	bestKnownSolutions := initializaBestKnownSolutions()
+	instanceFilenames := initializeFileNames()
 
-	stepProcessingInstanceFilename := "ftv55"
+	stepProcessingInstanceFilename := "ftv170"
 
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
@@ -110,15 +72,13 @@ func main() {
 			stepProcessing = true
 		}
 
-		println(stepProcessing)
-
 		bestKnown := bestKnownSolutions[filename]
 		fmt.Println("Best known: ", bestKnown)
 
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities := computeGS(solveOptimizedSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
+		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
 
 		if stepProcessing {
 			for index, element := range meanResult {
@@ -165,7 +125,7 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 	start := time.Now()
 	meanResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
 	bestResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
-	var stepPermutationsResult [][]int
+	stepPermutationsResult := make([][]int, runCount)
 
 	if stepProcessing {
 
@@ -178,7 +138,7 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 						bestResultsAfterStep[(i/STEP)-1] = minOfArray(qualities[0:i])
 					}
 				}
-				stepPermutationsResult = append(stepPermutationsResult, permutation)
+				stepPermutationsResult[i] = permutation
 				stepCounts[i] = stepCount
 				reviewedSolutionsNumbers[i] = reviewedSolutions
 				result := getDistance(permutation, distances)
@@ -220,6 +180,53 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 		ftoa(meanResult / float64(elapsed.Milliseconds())),
 	}
 	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep, stepPermutationsResult, qualities
+}
+
+func initializaBestKnownSolutions() map[string]int {
+	return map[string]int{
+		"br17":   39,
+		"ft53":   6905,
+		"ftv33":  1286,
+		"ft70":   38673,
+		"ftv35":  1473,
+		"ftv44":  1613,
+		"ftv38":  1530,
+		"ftv55":  1608,
+		"ftv47":  1776,
+		"ftv64":  1839,
+		"ftv70":  1950,
+		"ftv100": 1788,
+		"ftv110": 1958,
+		"ftv90":  1579,
+		"ftv120": 2166,
+		"ftv130": 2307,
+		"ftv140": 2420,
+		"ftv150": 2611,
+		"ftv170": 2755,
+		"ftv160": 2683,
+		"kro124": 36230,
+		"p43":    5620,
+		"rbg358": 1163,
+		"rbg323": 1326,
+		"rbg403": 2465,
+		"rbg443": 2720,
+		"ry48p":  14422,
+	}
+}
+
+func initializeFileNames() []string{
+	return []string{
+		"br17",
+		"ftv33",
+		"ftv35",
+		"ftv38",
+		"ftv44",
+		"ftv47",
+		"ft53",
+		"ftv55",
+		"ft70",
+		"ftv170",
+	}
 }
 
 func computeHeuristic(distances [][]int, bestKnown int) []string {

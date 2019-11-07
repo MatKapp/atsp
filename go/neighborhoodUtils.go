@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func findBestSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
 	reviewedSolutionsNumber := 0
@@ -97,8 +99,7 @@ func findBestReverseNeighborOptimized(permutation []int, distances [][]int) ([]i
 	return result, reviewedSolutionsNumber
 }
 
-func findBetterSwapNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
-	SIZE := len(permutation)
+func findBetterSwapNeighborOptimized(permutation []int, distances [][]int, SIZE int) ([]int, int) {
 	reviewedSolutionsNumber := 0
 
 	for i := 0; i < SIZE-1; i++ {
@@ -108,7 +109,6 @@ func findBetterSwapNeighborOptimized(permutation []int, distances [][]int) ([]in
 
 			if neighborProfit > 0 {
 				tmpSwap(permutation, i, j)
-				// neighbor := createNeighbor(permutation, i, j)
 				return permutation, reviewedSolutionsNumber
 			}
 		}
@@ -146,6 +146,11 @@ func findBetterReverseNeighborOptimized(permutation []int, distances [][]int) ([
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
+
+			if i == 8 && j == 9 {
+				fmt.Println(permutation)
+			}
+
 			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
 			reviewedSolutionsNumber++
 
@@ -206,18 +211,28 @@ func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int, 
 		return 0
 	}
 
+	neighborsChange := end-start == 1 || end-start == SIZE-1
+
 	actualPartialDistance := 0
 	newPartialDistance := 0
 
 	actualPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
-	actualPartialDistance += distances[perm[start]][perm[start+1]]
+
+	if !neighborsChange {
+		actualPartialDistance += distances[perm[start]][perm[start+1]]
+	}
+
 	actualPartialDistance += distances[perm[end-1]][perm[end]]
 	actualPartialDistance += distances[perm[end]][perm[(end+1)%SIZE]]
 
 	perm = tmpSwap(perm, start, end)
 
 	newPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
-	newPartialDistance += distances[perm[start]][perm[start+1]]
+
+	if !neighborsChange {
+		newPartialDistance += distances[perm[start]][perm[start+1]]
+	}
+
 	newPartialDistance += distances[perm[end-1]][perm[end]]
 	newPartialDistance += distances[perm[end]][perm[(end+1)%SIZE]]
 

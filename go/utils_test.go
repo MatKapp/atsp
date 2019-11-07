@@ -98,12 +98,17 @@ func TestCountNeighborSwapProfit(t *testing.T) {
 		t.Error("Profit error")
 	}
 
-	profit = countNeighborSwapProfit(perm, distances, 0, 3, SIZE) // (7 + 6 + 6 + 2) - (3 + 6 + 4 + 3) = 21 - 16 = 5
+	perm2 := []int{1, 2, 44, 39, 40, 41, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+		18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 3, 4, 5, 42, 43, 0}
+	distances2 := readData("../data/ftv44.atsp")
 
-	fmt.Println(profit)
+	value := getDistance(perm2, distances2)
+	tmpSwap(perm2, 8, 9)
+	newValue := getDistance(perm2, distances2)
+	tmpSwap(perm2, 8, 9)
 
-	if profit != 5 {
-		t.Error("Profit error")
+	if countNeighborSwapProfit(perm2, distances2, 8, 9, len(perm2)) != value-newValue {
+		t.Error("Neighbor swap error")
 	}
 }
 
