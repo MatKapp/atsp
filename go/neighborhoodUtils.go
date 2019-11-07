@@ -211,14 +211,17 @@ func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int, 
 		return 0
 	}
 
-	neighborsChange := end-start == 1 || end-start == SIZE-1
-
 	actualPartialDistance := 0
 	newPartialDistance := 0
 
-	actualPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
+	areNeighbors := end == start+1
+	areOverfllowNeighbors := end-start == SIZE-1
 
-	if !neighborsChange {
+	if !areOverfllowNeighbors {
+		actualPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
+	}
+
+	if !areNeighbors {
 		actualPartialDistance += distances[perm[start]][perm[start+1]]
 	}
 
@@ -227,9 +230,11 @@ func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int, 
 
 	perm = tmpSwap(perm, start, end)
 
-	newPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
+	if !areOverfllowNeighbors {
+		newPartialDistance += distances[perm[(start-1+SIZE)%SIZE]][perm[start]]
+	}
 
-	if !neighborsChange {
+	if !areNeighbors {
 		newPartialDistance += distances[perm[start]][perm[start+1]]
 	}
 

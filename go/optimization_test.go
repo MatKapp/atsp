@@ -19,6 +19,17 @@ func TestGreedy(t *testing.T) {
 	}
 }
 
+// test swap optimization (COMMENT PERMUTATAION SHUFFLE BEFORE THE TEST)
+func TestSteepest(t *testing.T) {
+	// if !AreSteepestResultsEqual("br17.atsp") {
+	// 	t.Error("Steepest optimization broke the result")
+	// }
+
+	if !AreSteepestResultsEqual("ftv44.atsp") {
+		t.Error("Steepest optimization broke the result")
+	}
+}
+
 func AreGreedyResultsEqual(instanceName string) bool {
 	distances := readData("../data/" + instanceName)
 	greedyResult := []int{}
@@ -88,17 +99,6 @@ func TestBestSwapNeighborOptimized(t *testing.T) {
 	}
 }
 
-// test swap optimization (COMMENT PERMUTATAION SHUFFLE BEFORE THE TEST)
-func TestSteepest(t *testing.T) {
-	// if !AreSteepestResultsEqual("br17.atsp") {
-	// 	t.Error("Steepest optimization broke the result")
-	// }
-
-	if !AreSteepestResultsEqual("ftv38.atsp") {
-		t.Error("Steepest optimization broke the result")
-	}
-}
-
 func TestGetBetterNeighbor(t *testing.T) {
 	distances := readData("../data/ftv44.atsp")
 	SIZE := len(distances)
@@ -134,6 +134,40 @@ func TestGetBetterNeighbor(t *testing.T) {
 			bestResult = newResult
 			resultImproved = true
 			stepCount++
+		}
+	}
+}
+
+func TestGetBestNeighbor(t *testing.T) {
+	distances := readData("../data/ftv44.atsp")
+	SIZE := len(distances)
+	result := makeArray(SIZE)
+	optimizedResult := makeArray(SIZE)
+
+	for i := 0; i < SIZE; i++ {
+		result[i] = i
+		optimizedResult[i] = i
+	}
+	bestResult := getDistance(result, distances)
+	resultImproved := true
+
+	for ok := true; ok; ok = resultImproved {
+		resultImproved = false
+		result, _ = findBestSwapNeighbor(result, distances)
+		optimizedResult, _, _ = findBestSwapNeighborOptimized(optimizedResult, distances, SIZE)
+
+		if !areSlicesEqual(result, optimizedResult) {
+			fmt.Println("____________________________________________")
+			t.Error("Results are not equal")
+		}
+
+		fmt.Println(result)
+		fmt.Println(optimizedResult)
+		newResult := getDistance(result, distances)
+
+		if newResult < bestResult {
+			bestResult = newResult
+			resultImproved = true
 		}
 	}
 }
