@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 func findBestSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
 	reviewedSolutionsNumber := 0
@@ -83,7 +81,7 @@ func findBestReverseNeighborOptimized(permutation []int, distances [][]int) ([]i
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
-			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j, SIZE)
 			reviewedSolutionsNumber++
 
 			if neighborProfit > bestProfit {
@@ -139,19 +137,13 @@ func findBetterSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	return result, reviewedSolutionsNumber
 }
 
-func findBetterReverseNeighborOptimized(permutation []int, distances [][]int) ([]int, int) {
-	SIZE := len(permutation)
+func findBetterReverseNeighborOptimized(permutation []int, distances [][]int, SIZE int) ([]int, int) {
 	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 
 	for i := 0; i < SIZE; i++ {
 		for j := 0; j < SIZE; j++ {
-
-			if i == 8 && j == 9 {
-				fmt.Println(permutation)
-			}
-
-			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
+			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j, SIZE)
 			reviewedSolutionsNumber++
 
 			if neighborProfit > 0 {
@@ -199,9 +191,9 @@ func createNeighbor(permutation []int, start int, end int) []int {
 	return result
 }
 
-func countNeighborDistanceDifference(permutation []int, distances [][]int, start int, end int) int {
-	actualPartialDistance := getPartialDistance(permutation, distances, start, end)
-	newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end)
+func countNeighborDistanceDifference(permutation []int, distances [][]int, start int, end int, SIZE int) int {
+	actualPartialDistance := getPartialDistance(permutation, distances, start, end, SIZE)
+	newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end, SIZE)
 	return actualPartialDistance - newPartialDistance
 }
 

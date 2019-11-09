@@ -34,13 +34,14 @@ func solveSwapSteepest(distances [][]int, stepProcessing bool) ([]int, int, int,
 	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
 }
 
-func solveOptimizedSwapSteepest(distances [][]int, stepProcessing bool) ([]int, int, int) {
+func solveOptimizedSwapSteepest(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
 	reviewedNeighborSolutions := 0
 	bestProfit := 0
+	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
@@ -54,10 +55,14 @@ func solveOptimizedSwapSteepest(distances [][]int, stepProcessing bool) ([]int, 
 		permutation, reviewedNeighborSolutions, bestProfit = findBestSwapNeighborOptimized(permutation, distances, SIZE)
 		reviewedSolutionsNumber += reviewedNeighborSolutions
 
+		if stepProcessing {
+			stepPermutations = append(stepPermutations, permutation)
+		}
+
 		if bestProfit > 0 {
 			resultImproved = true
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber
+	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
 }

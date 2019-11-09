@@ -8,29 +8,120 @@ import (
 )
 
 // test greedy optimization (COMMENT PERMUTATAION SHUFFLE BEFORE THE TEST)
-func TestGreedy(t *testing.T) {
-
-	// if !AreGreedyResultsEqual("br17.atsp") {
-	// 	t.Error("Greedy optimization broke the result")
-	// }
-
-	if !AreGreedyResultsEqual("ftv44.atsp") {
+func TestSwapGreedy(t *testing.T) {
+	if !AreSolversResultsEqual("ftv44.atsp", solveSwapGreedy, solveOptimizedSwapGreedy) {
 		t.Error("Greedy optimization broke the result")
 	}
 }
 
-// test swap optimization (COMMENT PERMUTATAION SHUFFLE BEFORE THE TEST)
-func TestSteepest(t *testing.T) {
-	// if !AreSteepestResultsEqual("br17.atsp") {
-	// 	t.Error("Steepest optimization broke the result")
-	// }
+func TestReverseGreedy(t *testing.T) {
+	if !AreSolversResultsEqual("ftv44.atsp", solveReverseGreedy, solveOptimizedReverseGreedy) {
+		t.Error("Greedy optimization broke the result")
+	}
+}
 
-	if !AreSteepestResultsEqual("ftv44.atsp") {
+func TestReverseSteepest(t *testing.T) {
+	if !AreSolversResultsEqual("ftv44.atsp", solveReverseSteepest, solveOptimizedReverseSteepest) {
 		t.Error("Steepest optimization broke the result")
 	}
 }
 
-func AreGreedyResultsEqual(instanceName string) bool {
+func TestSwapSteepest(t *testing.T) {
+	if !AreSolversResultsEqual("ftv44.atsp", solveSwapSteepest, solveOptimizedSwapSteepest) {
+		t.Error("Steepest optimization broke the result")
+	}
+}
+
+func AreFindBetterReverseNeighborResultsEqual(instanceName string) bool {
+	distances := readData("../data/" + instanceName)
+	SIZE := len(distances)
+	result := makeArray(SIZE)
+	optimisedResult := makeArray(SIZE)
+	reviewedSolutionsNumber := 0
+
+	for i := 0; i < SIZE; i++ {
+		result[i] = i
+		optimisedResult[i] = i
+	}
+
+	bestResult := getDistance(result, distances)
+	resultImproved := true
+
+	for ok := true; ok; ok = resultImproved {
+		resultImproved = false
+		reviewedNeighborSolutions := 0
+		result, reviewedNeighborSolutions = findBetterReverseNeighbor(result, distances)
+		optimisedResult, reviewedNeighborSolutions = findBetterReverseNeighborOptimized(optimisedResult, distances, SIZE)
+
+		reviewedSolutionsNumber += reviewedNeighborSolutions
+		newResult := getDistance(result, distances)
+
+		if newResult < bestResult {
+			bestResult = newResult
+			resultImproved = true
+		}
+	}
+	return areSlicesEqual(result, optimisedResult)
+}
+
+func AreSolversResultsEqual(instanceName string, solver func([][]int, bool) ([]int, int, int, [][]int), optimizedSolver func([][]int, bool) ([]int, int, int, [][]int)) bool {
+	distances := readData("../data/" + instanceName)
+	solverResult := []int{}
+	optimizedSolverResult := []int{}
+	stepCount := 0
+
+	start := time.Now()
+
+	for i := 0; i <= 1000; i++ {
+		solverResult, stepCount, _, _ = solver(distances, false)
+	}
+	elapsed := time.Since(start)
+	fmt.Println(solverResult)
+	fmt.Println("solverStepCount: " + itoa(stepCount))
+	println(itoa(getDistance(solverResult, distances)))
+	log.Printf("solver took %s", elapsed)
+
+	start = time.Now()
+	for i := 0; i <= 1000; i++ {
+		optimizedSolverResult, stepCount, _, _ = optimizedSolver(distances, false)
+	}
+	elapsed = time.Since(start)
+	fmt.Println(optimizedSolverResult)
+	fmt.Println("optimizedSolverStepCount: " + itoa(stepCount))
+	println(itoa(getDistance(optimizedSolverResult, distances)))
+	log.Printf("optimizedSolver took %s", elapsed)
+
+	return areSlicesEqual(solverResult, optimizedSolverResult)
+}
+
+func AreReverseSteepestResultsEqual(instanceName string) bool {
+	distances := readData("../data/" + instanceName)
+	SIZE := len(distances)
+	result := makeArray(SIZE)
+	resultOptimised := makeArray(SIZE)
+
+	for i := 0; i < SIZE; i++ {
+		result[i] = i
+		resultOptimised[i] = i
+	}
+	bestResult := getDistance(result, distances)
+	resultImproved := true
+
+	for ok := true; ok; ok = resultImproved {
+		resultImproved = false
+		result, _ = findBestReverseNeighbor(result, distances)
+		resultOptimised, _ = findBestReverseNeighborOptimized(resultOptimised, distances)
+		newResult := getDistance(result, distances)
+
+		if newResult < bestResult {
+			bestResult = newResult
+			resultImproved = true
+		}
+	}
+	return areSlicesEqual(result, resultOptimised)
+}
+
+func AreSwapGreedyResultsEqual(instanceName string) bool {
 	distances := readData("../data/" + instanceName)
 	greedyResult := []int{}
 	optimizedGreedyResult := []int{}
@@ -60,7 +151,7 @@ func AreGreedyResultsEqual(instanceName string) bool {
 	return areSlicesEqual(greedyResult, optimizedGreedyResult)
 }
 
-func AreSteepestResultsEqual(instanceName string) bool {
+func AreSwapSteepestResultsEqual(instanceName string) bool {
 	distances := readData("../data/" + instanceName)
 	steepestResult := []int{}
 	optimizedSteepestResult := []int{}
@@ -76,7 +167,7 @@ func AreSteepestResultsEqual(instanceName string) bool {
 
 	start = time.Now()
 	for i := 0; i <= 10000; i++ {
-		optimizedSteepestResult, _, _ = solveOptimizedSwapSteepest(distances, false)
+		optimizedSteepestResult, _, _, _ = solveOptimizedSwapSteepest(distances, false)
 	}
 	fmt.Println(optimizedSteepestResult)
 	elapsed = time.Since(start)

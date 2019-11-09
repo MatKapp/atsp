@@ -10,7 +10,7 @@ func solveReverseGreedy(distances [][]int, stepProcessing bool) ([]int, int, int
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	// permutation = shuffle(permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -40,14 +40,14 @@ func solveOptimizedReverseGreedy(distances [][]int, stepProcessing bool) ([]int,
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	permutation = shuffle(permutation)
+	// permutation = shuffle(permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
 		reviewedNeighborSolutions := 0
-		permutation, reviewedNeighborSolutions = findBetterReverseNeighborOptimized(permutation, distances)
+		permutation, reviewedNeighborSolutions = findBetterReverseNeighborOptimized(permutation, distances, SIZE)
 		reviewedSolutionsNumber += reviewedNeighborSolutions
 		newResult := getDistance(permutation, distances)
 

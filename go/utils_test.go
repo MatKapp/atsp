@@ -16,30 +16,31 @@ func TestGetPartialDistance(t *testing.T) {
 
 	permutation := []int{1, 2, 3, 0}
 	reversedPermutation := []int{0, 3, 2, 1} //3 + 6 + 4
+	SIZE := len(permutation)
 
 	distance := getDistance(permutation[0:len(permutation)], distances)
-	partialDistance := getPartialDistance(permutation, distances, 0, len(permutation)-1)
+	partialDistance := getPartialDistance(permutation, distances, 0, len(permutation)-1, SIZE)
 
 	if distance != partialDistance {
 		t.Error("GetPartialDistance error")
 	}
 
 	distance = 20
-	partialDistance = getPartialDistance(permutation, distances, 0, 2) //6 + 7 + 6 + 1
+	partialDistance = getPartialDistance(permutation, distances, 0, 2, SIZE) //6 + 7 + 6 + 1
 
 	if distance != partialDistance {
 		t.Error("GetPartialDistance error")
 	}
 
 	distance = 20
-	partialDistance = getPartialDistance(permutation, distances, 1, 3) //6 + 7 + 6 + 1
+	partialDistance = getPartialDistance(permutation, distances, 1, 3, SIZE) //6 + 7 + 6 + 1
 
 	if distance != partialDistance {
 		t.Error("GetPartialDistance error")
 	}
 
 	reversedDistance := getDistance(reversedPermutation[0:len(reversedPermutation)], distances)
-	reversedPartialDistance := getPartialDistanceReversed(permutation, distances, 0, len(permutation))
+	reversedPartialDistance := getPartialDistanceReversed(permutation, distances, 0, SIZE, SIZE)
 
 	if reversedDistance != reversedPartialDistance {
 		t.Error("GetPartialDistanceReversed error")

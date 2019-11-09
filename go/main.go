@@ -111,9 +111,9 @@ func main() {
 	}
 }
 
-func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64) {
 
-	runCount := DEFAULT_RUN_COUNT
+func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64) {
+runCount := DEFAULT_RUN_COUNT
 
 	if stepProcessing {
 		runCount = STEP_RUN_COUNT

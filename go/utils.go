@@ -72,8 +72,7 @@ func getDistance(perm []int, distances [][]int) int {
 	return sum
 }
 
-func getPartialDistance(perm []int, distances [][]int, start int, end int) int {
-	SIZE := len(perm)
+func getPartialDistance(perm []int, distances [][]int, start int, end int, SIZE int) int {
 	numberOfSteps := end - start + 2
 	sum := 0
 	startIndex := (start - 1 + SIZE) % SIZE
@@ -89,10 +88,10 @@ func getPartialDistance(perm []int, distances [][]int, start int, end int) int {
 	return sum
 }
 
-func getPartialDistanceReversed(perm []int, distances [][]int, start int, end int) int {
+func getPartialDistanceReversed(perm []int, distances [][]int, start int, end int, SIZE int) int {
 	sum := 0
 	perm = reversePermutationPart(perm, start, end)
-	sum = getPartialDistance(perm, distances, start, end)
+	sum = getPartialDistance(perm, distances, start, end, SIZE)
 	perm = reversePermutationPart(perm, start, end)
 	return sum
 }
