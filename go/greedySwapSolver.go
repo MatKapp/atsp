@@ -49,7 +49,9 @@ func solveOptimizedSwapGreedy(distances [][]int, stepProcessing bool) ([]int, in
 		reviewedNeighborSolutions := 0
 		permutation, reviewedNeighborSolutions = findBetterSwapNeighborOptimized(permutation, distances, SIZE)
 		if stepProcessing {
-			stepPermutations = append(stepPermutations, permutation)
+			processingStep := makeArray(SIZE)
+			copy(processingStep, permutation)
+			stepPermutations = append(stepPermutations, processingStep)
 		}
 
 		reviewedSolutionsNumber += reviewedNeighborSolutions

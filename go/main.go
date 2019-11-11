@@ -19,7 +19,7 @@ func main() {
 	bestKnownSolutions := initializaBestKnownSolutions()
 	instanceFilenames := initializeFileNames()
 
-	stepProcessingInstanceFilename := "kro124p"
+	stepProcessingInstanceFilename := "rbg323"
 
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
@@ -30,6 +30,7 @@ func main() {
 	stepMeanProcessingFile, stepMeanProcessingWriter := getWriter("../results/stepMeanProcessing-" + stepProcessingInstanceFilename + ".csv")
 	stepBestProcessingFile, stepBestProcessingWriter := getWriter("../results/stepBestProcessing-" + stepProcessingInstanceFilename + ".csv")
 	stepSimilarityFile, stepSimilarityWriter := getWriter("../results/similarity-" + stepProcessingInstanceFilename + ".csv")
+	runInternalQualitiesFile, runInternalQualitiesWriter := getWriter("../results/runInternalPermutations-" + stepProcessingInstanceFilename + ".csv")
 
 	defer swapGreedyFile.Close()
 	defer reverseGreedyFile.Close()
@@ -40,6 +41,7 @@ func main() {
 	defer stepMeanProcessingFile.Close()
 	defer stepBestProcessingFile.Close()
 	defer stepSimilarityFile.Close()
+	defer runInternalQualitiesFile.Close()
 	defer swapGreedyWriter.Flush()
 	defer reverseGreedyWriter.Flush()
 	defer swapSteepestWriter.Flush()
@@ -49,6 +51,7 @@ func main() {
 	defer stepMeanProcessingWriter.Flush()
 	defer stepBestProcessingWriter.Flush()
 	defer stepSimilarityWriter.Flush()
+	defer runInternalQualitiesWriter.Flush()
 
 	swapGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
 	reverseGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
@@ -59,6 +62,7 @@ func main() {
 	stepMeanProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 	stepBestProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 	stepSimilarityWriter.Write([]string{"step", "quality", "similarity"})
+	runInternalQualitiesWriter.Write([]string{"iteration_num", "quality"})
 
 	for _, filename := range instanceFilenames {
 		fmt.Println()
@@ -78,7 +82,7 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities := computeGS(solveOptimizedSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
+		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities, runInternalQualities := computeGS(solveOptimizedSwapSteepest, distances, bestKnown, "SwapGreedy", stepProcessing)
 
 		if stepProcessing {
 			for index, element := range meanResult {
@@ -95,15 +99,19 @@ func main() {
 			for index, element := range stepPermutations {
 				stepSimilarityWriter.Write([]string{itoa(index), ftoa(qualities[index]), ftoa(countSimilarity(element, bestPermutation))})
 			}
+
+			for index, element := range runInternalQualities {
+				runInternalQualitiesWriter.Write([]string{itoa(index), ftoa(element)})
+			}
 		}
 
 		swapGreedyWriter.Write(swapGreedyOutput)
-		_, reverseGreedyOutput, _, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
+		_, reverseGreedyOutput, _, _, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
 		reverseGreedyWriter.Write(reverseGreedyOutput)
 
-		swapSteepestElapsed, swapSteepestOutput, _, _, _, _ := computeGS(solveOptimizedSwapSteepest, distances, bestKnown, "SwapSteepest", false)
+		swapSteepestElapsed, swapSteepestOutput, _, _, _, _, _ := computeGS(solveOptimizedSwapSteepest, distances, bestKnown, "SwapSteepest", false)
 		swapSteepestWriter.Write(swapSteepestOutput)
-		_, reverseSteepestOutput, _, _, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
+		_, reverseSteepestOutput, _, _, _, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
 		reverseSteepestWriter.Write(reverseSteepestOutput)
 
 		rOutput := computeRandom(distances, swapSteepestElapsed, bestKnown)
@@ -111,7 +119,7 @@ func main() {
 	}
 }
 
-func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64) {
+func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64, []float64) {
 	runCount := DEFAULT_RUN_COUNT
 
 	if stepProcessing {
@@ -124,24 +132,34 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 	start := time.Now()
 	meanResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
 	bestResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
-	stepPermutationsResult := make([][]int, runCount)
+	startupResults := make([][]int, runCount)
+	var runInternalQualities []float64
 
 	if stepProcessing {
 
 		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-			permutation, stepCount, reviewedSolutions, _ := solve(distances, stepProcessing)
+			permutation, stepCount, reviewedSolutions, internalPermutations := solve(distances, stepProcessing)
+
+			if i == 0 {
+				for j := 0; j < len(internalPermutations); j++ {
+					distance := getDistance(internalPermutations[j], distances)
+					runInternalQualities = append(runInternalQualities, getQuality(distance, bestKnown))
+				}
+			}
+
 			if i < runCount {
+				startupResults[i] = permutation
+				stepCounts[i] = stepCount
+				reviewedSolutionsNumbers[i] = reviewedSolutions
+				result := getDistance(permutation, distances)
+				qualities[i] = getQuality(result, bestKnown)
+
 				if i%STEP == 0 {
 					if i > 0 {
 						meanResultsAfterStep[(i/STEP)-1] = mean(qualities[0:i])
 						bestResultsAfterStep[(i/STEP)-1] = minOfArray(qualities[0:i])
 					}
 				}
-				stepPermutationsResult[i] = permutation
-				stepCounts[i] = stepCount
-				reviewedSolutionsNumbers[i] = reviewedSolutions
-				result := getDistance(permutation, distances)
-				qualities[i] = getQuality(result, bestKnown)
 			}
 		}
 	} else {
@@ -178,7 +196,7 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 		ftoa(meanReviewedSolutions),
 		ftoa(meanResult / float64(elapsed.Milliseconds())),
 	}
-	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep, stepPermutationsResult, qualities
+	return elapsed, output, meanResultsAfterStep, bestResultsAfterStep, startupResults, qualities, runInternalQualities
 }
 
 func initializaBestKnownSolutions() map[string]int {
@@ -224,7 +242,7 @@ func initializeFileNames() []string {
 		"ft53",
 		"ftv55",
 		"ft70",
-		"kro124p",
+		"rbg323",
 	}
 }
 
