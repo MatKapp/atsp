@@ -141,8 +141,8 @@ func findBetterReverseNeighborOptimized(permutation []int, distances [][]int, SI
 	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
 			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j, SIZE)
 			reviewedSolutionsNumber++
 
@@ -192,8 +192,8 @@ func createNeighbor(permutation []int, start int, end int) []int {
 
 func countNeighborDistanceDifference(permutation []int, distances [][]int, start int, end int, SIZE int) int {
 	actualPartialDistance := getPartialDistance(permutation, distances, start, end, SIZE)
-	newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end, SIZE)
-	// newPartialDistanceOptimized := getPartialDistanceReversedOptimized(permutation, distances, start, end, SIZE)
+	// newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end, SIZE)
+	newPartialDistance := getPartialDistanceReversedOptimized(permutation, distances, start, end, SIZE)
 
 	// if newPartialDistance != newPartialDistanceOptimized {
 	// 	fmt.Println("error")
