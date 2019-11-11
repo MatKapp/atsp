@@ -17,7 +17,7 @@ func solveReverseSteepest(distances [][]int, stepProcessing bool) ([]int, int, i
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
 		reviewedNeighborSolutions := 0
-		permutation, reviewedNeighborSolutions = findBestReverseNeighbor(permutation, distances)
+		permutation, reviewedNeighborSolutions = findBestReverseNeighborOptimized(permutation, distances)
 		reviewedSolutionsNumber += reviewedNeighborSolutions
 		newResult := getDistance(permutation, distances)
 
