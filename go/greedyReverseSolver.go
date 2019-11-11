@@ -17,7 +17,7 @@ func solveReverseGreedy(distances [][]int, stepProcessing bool) ([]int, int, int
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
 		reviewedNeighborSolutions := 0
-		permutation, reviewedNeighborSolutions = findBetterReverseNeighbor(permutation, distances)
+		permutation, reviewedNeighborSolutions = findBetterReverseNeighbor(permutation, distances, SIZE)
 		reviewedSolutionsNumber += reviewedNeighborSolutions
 		newResult := getDistance(permutation, distances)
 

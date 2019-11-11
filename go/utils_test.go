@@ -45,9 +45,76 @@ func TestGetPartialDistance(t *testing.T) {
 	if reversedDistance != reversedPartialDistance {
 		t.Error("GetPartialDistanceReversed error")
 	}
-
 }
 
+func TestCreateNeighbor(t *testing.T) {
+	perm := []int{0, 1, 2, 3, 4, 5, 6}
+	neighbor := []int{0, 1, 2, 4, 3, 5, 6}
+
+	result := createNeighbor(perm, 3, 4)
+
+	if !areSlicesEqual(neighbor, result) {
+		t.Error("create neighbor error")
+	}
+
+	neighbor = []int{0, 1, 4, 3, 2, 5, 6}
+
+	result = createNeighbor(perm, 2, 4)
+
+	if !areSlicesEqual(neighbor, result) {
+		t.Error("create neighbor error")
+	}
+
+	neighbor = []int{6, 5, 4, 3, 2, 1, 0}
+
+	result = createNeighbor(perm, 0, 6)
+
+	if !areSlicesEqual(neighbor, result) {
+		t.Error("create neighbor error")
+	}
+
+	neighbor = []int{1, 0, 2, 3, 4, 5, 6}
+
+	result = createNeighbor(perm, 0, 1)
+
+	if !areSlicesEqual(neighbor, result) {
+		t.Error("create neighbor error")
+	}
+
+	neighbor = []int{0, 1, 2, 3, 4, 6, 5}
+
+	result = createNeighbor(perm, 5, 6)
+
+	if !areSlicesEqual(neighbor, result) {
+		t.Error("create neighbor error")
+	}
+}
+
+func TestGetPartialDistanceReversedOptimized(t *testing.T) {
+	distances := [][]int{
+		{0, 1, 2, 3},
+		{4, 5, 6, 7},
+		{8, 9, 8, 7},
+		{6, 5, 6, 7},
+	}
+
+	permutation := []int{1, 2, 3, 0}
+	SIZE := len(permutation)
+
+	reversedPartialDistance := getPartialDistanceReversed(permutation, distances, 1, 2, SIZE)
+	reversedPartialDistanceOptimized := getPartialDistanceReversedOptimized(permutation, distances, 1, 2, SIZE)
+
+	if reversedPartialDistance != reversedPartialDistanceOptimized {
+		t.Error("ReversedPartialDistance  error")
+	}
+
+	reversedPartialDistance = getPartialDistanceReversed(permutation, distances, 0, 3, SIZE)
+	reversedPartialDistanceOptimized = getPartialDistanceReversedOptimized(permutation, distances, 0, 3, SIZE)
+
+	if reversedPartialDistance != reversedPartialDistanceOptimized {
+		t.Error("ReversedPartialDistance  error")
+	}
+}
 func TestReversePermutationPart(t *testing.T) {
 	perm := []int{1, 2, 3, 4}
 	SIZE := len(perm)

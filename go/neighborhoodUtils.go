@@ -55,8 +55,8 @@ func findBestReverseNeighbor(permutation []int, distances [][]int) ([]int, int) 
 	copy(result, permutation)
 	bestResult := getDistance(permutation, distances)
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
 			neighbor := createNeighbor(permutation, i, j)
 			newResult := getDistance(neighbor, distances)
 			reviewedSolutions++
@@ -79,8 +79,8 @@ func findBestReverseNeighborOptimized(permutation []int, distances [][]int) ([]i
 	copy(result, permutation)
 	bestProfit := 0
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
 			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j, SIZE)
 			reviewedSolutionsNumber++
 
@@ -156,14 +156,13 @@ func findBetterReverseNeighborOptimized(permutation []int, distances [][]int, SI
 	return permutation, reviewedSolutionsNumber
 }
 
-func findBetterReverseNeighbor(permutation []int, distances [][]int) ([]int, int) {
-	SIZE := len(permutation)
+func findBetterReverseNeighbor(permutation []int, distances [][]int, SIZE int) ([]int, int) {
 	reviewedSolutionsNumber := 0
 	result := makeArray(SIZE)
 	oldResult := getDistance(permutation, distances)
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
 			neighbor := createNeighbor(permutation, i, j)
 			newResult := getDistance(neighbor, distances)
 			reviewedSolutionsNumber++
@@ -178,7 +177,7 @@ func findBetterReverseNeighbor(permutation []int, distances [][]int) ([]int, int
 }
 
 func createNeighbor(permutation []int, start int, end int) []int {
-	distance := end - start
+	distance := end - start + 1
 	SIZE := len(permutation)
 	result := makeArray(SIZE)
 	copy(result, permutation)
@@ -194,6 +193,14 @@ func createNeighbor(permutation []int, start int, end int) []int {
 func countNeighborDistanceDifference(permutation []int, distances [][]int, start int, end int, SIZE int) int {
 	actualPartialDistance := getPartialDistance(permutation, distances, start, end, SIZE)
 	newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end, SIZE)
+	// newPartialDistanceOptimized := getPartialDistanceReversedOptimized(permutation, distances, start, end, SIZE)
+
+	// if newPartialDistance != newPartialDistanceOptimized {
+	// 	fmt.Println("error")
+	// } else {
+	// 	fmt.Println("____________________________________GOOOOOOOOOOOOD_____________________")
+	// }
+
 	return actualPartialDistance - newPartialDistance
 }
 

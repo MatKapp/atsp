@@ -15,7 +15,7 @@ func TestSwapGreedy(t *testing.T) {
 }
 
 func TestReverseGreedy(t *testing.T) {
-	if !AreSolversResultsEqual("ftv44.atsp", solveReverseGreedy, solveOptimizedReverseGreedy) {
+	if !AreSolversResultsEqual("ftv47.atsp", solveReverseGreedy, solveOptimizedReverseGreedy) {
 		t.Error("Greedy optimization broke the result")
 	}
 }
@@ -32,16 +32,22 @@ func TestSwapSteepest(t *testing.T) {
 	}
 }
 
+func TestFindBetterReverseNeighborResultsEqual(t *testing.T) {
+	if !AreFindBetterReverseNeighborResultsEqual("ftv44.atsp") {
+		t.Error("Find better reverse neighbor optimization broke the result")
+	}
+}
+
 func AreFindBetterReverseNeighborResultsEqual(instanceName string) bool {
 	distances := readData("../data/" + instanceName)
 	SIZE := len(distances)
 	result := makeArray(SIZE)
-	optimisedResult := makeArray(SIZE)
+	optimizedResult := makeArray(SIZE)
 	reviewedSolutionsNumber := 0
 
 	for i := 0; i < SIZE; i++ {
 		result[i] = i
-		optimisedResult[i] = i
+		optimizedResult[i] = i
 	}
 
 	bestResult := getDistance(result, distances)
@@ -50,8 +56,14 @@ func AreFindBetterReverseNeighborResultsEqual(instanceName string) bool {
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
 		reviewedNeighborSolutions := 0
-		result, reviewedNeighborSolutions = findBetterReverseNeighbor(result, distances)
-		optimisedResult, reviewedNeighborSolutions = findBetterReverseNeighborOptimized(optimisedResult, distances, SIZE)
+		result, reviewedNeighborSolutions = findBetterReverseNeighbor(result, distances, SIZE)
+		optimizedResult, reviewedNeighborSolutions = findBetterReverseNeighborOptimized(optimizedResult, distances, SIZE)
+
+		if !areSlicesEqual(result, optimizedResult) {
+			fmt.Println("Are not equal")
+			fmt.Println(result)
+			fmt.Println(optimizedResult)
+		}
 
 		reviewedSolutionsNumber += reviewedNeighborSolutions
 		newResult := getDistance(result, distances)
@@ -61,7 +73,7 @@ func AreFindBetterReverseNeighborResultsEqual(instanceName string) bool {
 			resultImproved = true
 		}
 	}
-	return areSlicesEqual(result, optimisedResult)
+	return areSlicesEqual(result, optimizedResult)
 }
 
 func AreSolversResultsEqual(instanceName string, solver func([][]int, bool) ([]int, int, int, [][]int), optimizedSolver func([][]int, bool) ([]int, int, int, [][]int)) bool {
@@ -98,11 +110,11 @@ func AreReverseSteepestResultsEqual(instanceName string) bool {
 	distances := readData("../data/" + instanceName)
 	SIZE := len(distances)
 	result := makeArray(SIZE)
-	resultOptimised := makeArray(SIZE)
+	resultOptimized := makeArray(SIZE)
 
 	for i := 0; i < SIZE; i++ {
 		result[i] = i
-		resultOptimised[i] = i
+		resultOptimized[i] = i
 	}
 	bestResult := getDistance(result, distances)
 	resultImproved := true
@@ -110,7 +122,7 @@ func AreReverseSteepestResultsEqual(instanceName string) bool {
 	for ok := true; ok; ok = resultImproved {
 		resultImproved = false
 		result, _ = findBestReverseNeighbor(result, distances)
-		resultOptimised, _ = findBestReverseNeighborOptimized(resultOptimised, distances)
+		resultOptimized, _ = findBestReverseNeighborOptimized(resultOptimized, distances)
 		newResult := getDistance(result, distances)
 
 		if newResult < bestResult {
@@ -118,7 +130,7 @@ func AreReverseSteepestResultsEqual(instanceName string) bool {
 			resultImproved = true
 		}
 	}
-	return areSlicesEqual(result, resultOptimised)
+	return areSlicesEqual(result, resultOptimized)
 }
 
 func AreSwapGreedyResultsEqual(instanceName string) bool {

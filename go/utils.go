@@ -88,6 +88,23 @@ func getPartialDistance(perm []int, distances [][]int, start int, end int, SIZE 
 	return sum
 }
 
+func getPartialDistanceReversedOptimized(perm []int, distances [][]int, start int, end int, SIZE int) int {
+	sum := 0
+
+	for i := end; i > start; i-- {
+		sum += distances[perm[i]][perm[i-1]]
+	}
+
+	if end-start != SIZE-1 {
+		sum += distances[perm[(start-1+SIZE)%SIZE]][perm[end]]
+		sum += distances[perm[start]][perm[(end+1)%SIZE]]
+	} else {
+		sum += distances[perm[start]][perm[end]]
+	}
+
+	return sum
+}
+
 func getPartialDistanceReversed(perm []int, distances [][]int, start int, end int, SIZE int) int {
 	sum := 0
 	perm = reversePermutationPart(perm, start, end)
@@ -97,7 +114,8 @@ func getPartialDistanceReversed(perm []int, distances [][]int, start int, end in
 }
 
 func reversePermutationPart(perm []int, start int, end int) []int {
-	swapsNumber := (end - start) / 2
+
+	swapsNumber := (end - start + 1) / 2
 
 	for i := 0; i < swapsNumber; i++ {
 		tmpSwap(perm, start+i, end-i)
