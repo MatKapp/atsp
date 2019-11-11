@@ -194,7 +194,7 @@ func maxOfArray(array []int) int {
 }
 
 func minFloatOfArray(array []float64) (float64, int) {
-	minValue := 0.0
+	minValue := math.MaxFloat64
 	index := 0
 
 	for i, val := range array {
