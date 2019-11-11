@@ -19,7 +19,7 @@ func main() {
 	bestKnownSolutions := initializaBestKnownSolutions()
 	instanceFilenames := initializeFileNames()
 
-	stepProcessingInstanceFilename := "ftv170"
+	stepProcessingInstanceFilename := "kro124p"
 
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
@@ -78,7 +78,7 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities := computeGS(solveSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
+		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities := computeGS(solveOptimizedSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
 
 		if stepProcessing {
 			for index, element := range meanResult {
@@ -101,7 +101,7 @@ func main() {
 		_, reverseGreedyOutput, _, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
 		reverseGreedyWriter.Write(reverseGreedyOutput)
 
-		swapSteepestElapsed, swapSteepestOutput, _, _, _, _ := computeGS(solveSwapSteepest, distances, bestKnown, "SwapSteepest", false)
+		swapSteepestElapsed, swapSteepestOutput, _, _, _, _ := computeGS(solveOptimizedSwapSteepest, distances, bestKnown, "SwapSteepest", false)
 		swapSteepestWriter.Write(swapSteepestOutput)
 		_, reverseSteepestOutput, _, _, _, _ := computeGS(solveReverseSteepest, distances, bestKnown, "ReverseSteepest", false)
 		reverseSteepestWriter.Write(reverseSteepestOutput)
@@ -111,9 +111,8 @@ func main() {
 	}
 }
 
-
 func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64) {
-runCount := DEFAULT_RUN_COUNT
+	runCount := DEFAULT_RUN_COUNT
 
 	if stepProcessing {
 		runCount = STEP_RUN_COUNT
@@ -184,37 +183,37 @@ runCount := DEFAULT_RUN_COUNT
 
 func initializaBestKnownSolutions() map[string]int {
 	return map[string]int{
-		"br17":   39,
-		"ft53":   6905,
-		"ftv33":  1286,
-		"ft70":   38673,
-		"ftv35":  1473,
-		"ftv44":  1613,
-		"ftv38":  1530,
-		"ftv55":  1608,
-		"ftv47":  1776,
-		"ftv64":  1839,
-		"ftv70":  1950,
-		"ftv100": 1788,
-		"ftv110": 1958,
-		"ftv90":  1579,
-		"ftv120": 2166,
-		"ftv130": 2307,
-		"ftv140": 2420,
-		"ftv150": 2611,
-		"ftv170": 2755,
-		"ftv160": 2683,
-		"kro124": 36230,
-		"p43":    5620,
-		"rbg358": 1163,
-		"rbg323": 1326,
-		"rbg403": 2465,
-		"rbg443": 2720,
-		"ry48p":  14422,
+		"br17":    39,
+		"ft53":    6905,
+		"ftv33":   1286,
+		"ft70":    38673,
+		"ftv35":   1473,
+		"ftv44":   1613,
+		"ftv38":   1530,
+		"ftv55":   1608,
+		"ftv47":   1776,
+		"ftv64":   1839,
+		"ftv70":   1950,
+		"ftv100":  1788,
+		"ftv110":  1958,
+		"ftv90":   1579,
+		"ftv120":  2166,
+		"ftv130":  2307,
+		"ftv140":  2420,
+		"ftv150":  2611,
+		"ftv170":  2755,
+		"ftv160":  2683,
+		"kro124p": 36230,
+		"p43":     5620,
+		"rbg358":  1163,
+		"rbg323":  1326,
+		"rbg403":  2465,
+		"rbg443":  2720,
+		"ry48p":   14422,
 	}
 }
 
-func initializeFileNames() []string{
+func initializeFileNames() []string {
 	return []string{
 		"br17",
 		"ftv33",
@@ -225,7 +224,7 @@ func initializeFileNames() []string{
 		"ft53",
 		"ftv55",
 		"ft70",
-		"ftv170",
+		"kro124p",
 	}
 }
 

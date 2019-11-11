@@ -10,7 +10,7 @@ func solveReverseSteepest(distances [][]int, stepProcessing bool) ([]int, int, i
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	// permutation = shuffle(permutation)
+	permutation = shuffle(permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -40,7 +40,7 @@ func solveOptimizedReverseSteepest(distances [][]int, stepProcessing bool) ([]in
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
-	// permutation = shuffle(permutation)
+	permutation = shuffle(permutation)
 
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true

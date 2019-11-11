@@ -202,14 +202,7 @@ func reversePart(permutation []int, start int, end int, SIZE int) []int {
 
 func countNeighborDistanceDifference(permutation []int, distances [][]int, start int, end int, SIZE int) int {
 	actualPartialDistance := getPartialDistance(permutation, distances, start, end, SIZE)
-	// newPartialDistance := getPartialDistanceReversed(permutation, distances, start, end, SIZE)
 	newPartialDistance := getPartialDistanceReversedOptimized(permutation, distances, start, end, SIZE)
-
-	// if newPartialDistance != newPartialDistanceOptimized {
-	// 	fmt.Println("error")
-	// } else {
-	// 	fmt.Println("____________________________________GOOOOOOOOOOOOD_____________________")
-	// }
 
 	return actualPartialDistance - newPartialDistance
 }
