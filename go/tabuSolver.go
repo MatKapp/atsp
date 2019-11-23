@@ -11,8 +11,8 @@ func solveTabu(distances [][]int, permutation []int) ([]int, int)  {
   // TODO parametrize TABU_SIZE and WAIT_ITERATIONS
   TABU_SIZE := SIZE / 4
   WAIT_ITERATIONS := SIZE
-	// permutation := makePermutation(SIZE)
-	// permutation = shuffle(permutation)
+	permutation := makePermutation(SIZE)
+	permutation = shuffle(permutation)
 
   bestPermutation := makeArray(SIZE)
   counter := 0
@@ -46,8 +46,7 @@ func solveTabu(distances [][]int, permutation []int) ([]int, int)  {
 }
 
 func findTabuNeighbor(permutation []int, distances [][]int, SIZE int, tabuList *list.List) ([]int, int, []int) {
-	neighborI := 0
-	neighborJ := 0
+	swap := []int{0, 0}
 	bestProfit := math.MinInt32
 	profit := 0
 
@@ -57,24 +56,23 @@ func findTabuNeighbor(permutation []int, distances [][]int, SIZE int, tabuList *
 
       // Conditions have been split for performance
 			if profit > bestProfit {
-        aspirationCriterion := profit > 0 || !listContains(tabuList, []int{i, j})
+        aspirationCriterion := profit > 0 || !listContains(tabuList, i, j)
         if aspirationCriterion {
   				bestProfit = profit
-  				neighborI = i
-  				neighborJ = j
+  				swap = []int{i, j}
         }
 			}
 		}
 	}
 
-	tmpSwap(permutation, neighborI, neighborJ)
-	return permutation, bestProfit, []int{neighborI, neighborJ}
+	tmpSwap(permutation, swap[0], swap[1])
+	return permutation, bestProfit, swap
 }
 
-func listContains(lst *list.List, value []int) bool{
+func listContains(lst *list.List, v1 int, v2 int) bool{
   for e := lst.Front(); e != nil; e = e.Next() {
     el := e.Value.([]int)
-		if el[0] == value[0] && el[1] == value[1] {
+		if el[0] == v1 && el[1] == v2 {
       return true
     }
 	}

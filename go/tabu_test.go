@@ -42,6 +42,6 @@ func TestTabuNotWorse(t *testing.T) {
 			tabuBetter++
 		}
 	}
-	// 1694748 868 0
+	// 1694748 868 0 3.739s
 	fmt.Println(tabuSum, tabuBetter, tabuWorse)
 }
