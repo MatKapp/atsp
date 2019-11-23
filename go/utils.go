@@ -183,6 +183,14 @@ func makeArray(SIZE int) []int {
 	return make([]int, SIZE)
 }
 
+func makePermutation(SIZE int) []int {
+	permutation := makeArray(SIZE)
+	for i := 0; i < SIZE; i++ {
+		permutation[i] = i
+	}
+	return permutation
+}
+
 func maxOfArray(array []int) int {
 	maxValue := math.MinInt32
 	for _, val := range array {
