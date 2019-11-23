@@ -13,6 +13,7 @@ func TestTabuNotWorse(t *testing.T) {
 	permutation := makePermutation(SIZE)
 	perm2 := makePermutation(SIZE)
 
+	tabuSum := 0
 	tabuBetter := 0
 	tabuWorse := 0
 
@@ -34,11 +35,13 @@ func TestTabuNotWorse(t *testing.T) {
 		fmt.Println(tabuResult, steepestResult)
 		fmt.Println(tabuTime, steepestTime)
 
+		tabuSum += tabuResult
 		if tabuResult > steepestResult {
 			tabuWorse++
 		} else if tabuResult < steepestResult{
 			tabuBetter++
 		}
 	}
-	fmt.Println(tabuBetter, tabuWorse)
+	// 1694748 868 0
+	fmt.Println(tabuSum, tabuBetter, tabuWorse)
 }
