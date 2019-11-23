@@ -2,38 +2,33 @@ package main
 
 import (
   "container/list"
-  "math"
   "time"
 )
 
-const TABU_SIZE = 100000
-const TIME = 100000000
+const TABU_SIZE = 50
+const TIME = 10000000000
 
-func solveTabu(distances [][]int) ([]int, int)  {
+func solveTabu(distances [][]int, permutation []int) ([]int, int)  {
 	SIZE := len(distances)
-	permutation := makePermutation(SIZE)
+	// permutation := makePermutation(SIZE)
   start := time.Now()
 
-	bestResult := getDistance(permutation, distances)
   bestPermutation := permutation
 	tabuInProgress := true
   tabuList := list.New()
-  tabuList.PushFront(permutation)
 
 	for ok := true; ok; ok = tabuInProgress && time.Since(start) < TIME {
 		tabuInProgress = false
-		neighbor := findTabuNeighbor(permutation, distances, tabuList)
-		newResult := getDistance(neighbor, distances)
+		neighbor, profit, swap := findTabuNeighbor(permutation, distances, SIZE, tabuList)
 
 		if !arraysEqual(permutation, neighbor) {
       permutation = neighbor
-      if newResult < bestResult {
-			     bestResult = newResult
+      if profit > 0 {
            bestPermutation = permutation
       }
 			tabuInProgress = true
 
-      tabuList.PushFront(permutation)
+      tabuList.PushFront(swap)
       if tabuList.Len() > TABU_SIZE {
           tabuList.Remove(tabuList.Back())
       }
@@ -42,34 +37,58 @@ func solveTabu(distances [][]int) ([]int, int)  {
 	return bestPermutation, 0
 }
 
-func findTabuNeighbor(permutation []int, distances [][]int, tabuList *list.List) []int {
-  // If no neighbor is better, returns the same permutation
-	SIZE := len(permutation)
+func findTabuNeighbor(permutation []int, distances [][]int, SIZE int, tabuList *list.List) ([]int,  int, []int) {
+	reviewedSolutionsNumber := 0
+	neighborI := 0
+	neighborJ := 0
+	bestProfit := 0
+	neighborProfit := 0
 
-	result := makeArray(SIZE)
-	bestNeighbor := []int{0, 0}
-	copy(result, permutation)
-	bestProfit := math.MinInt32
+	for i := 0; i < SIZE-1; i++ {
+		for j := i + 1; j < SIZE; j++ {
+			neighborProfit = countNeighborSwapProfit(permutation, distances, i, j, SIZE)
+			reviewedSolutionsNumber++
 
-	for i := 0; i < SIZE; i++ {
-		for j := 0; j < SIZE; j++ {
-			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j)
-
-      neigh := createNeighbor(permutation, i, j)
-			if neighborProfit > bestProfit && !listContains(tabuList, neigh) {
+			if neighborProfit > bestProfit && !listContains(tabuList, []int{i, j}){
 				bestProfit = neighborProfit
-				bestNeighbor[0] = i
-				bestNeighbor[1] = j
+				neighborI = i
+				neighborJ = j
 			}
 		}
 	}
 
-	copy(result, createNeighbor(permutation, bestNeighbor[0], bestNeighbor[1]))
+	tmpSwap(permutation, neighborI, neighborJ)
 
-	return result
+	return permutation, bestProfit, []int{neighborI, neighborJ}
 }
 
-
+// func findTabuNeighbor(permutation []int, distances [][]int, tabuList *list.List) ([]int, []int) {
+//   // If there is no valid neighbor, returns the same permutation
+// 	SIZE := len(permutation)
+//
+// 	result := makeArray(SIZE)
+// 	bestNeighbor := []int{0, 0}
+// 	copy(result, permutation)
+// 	bestProfit := math.MinInt32
+//
+// 	for i := 0; i < SIZE; i++ {
+// 		for j := 0; j < SIZE; j++ {
+// 			neighborProfit := countNeighborDistanceDifference(permutation, distances, i, j, SIZE)
+//
+// 			if neighborProfit > bestProfit {//&& !listContains(tabuList, []int{i, j}) {
+// 				bestProfit = neighborProfit
+// 				bestNeighbor[0] = i
+// 				bestNeighbor[1] = j
+// 			}
+// 		}
+// 	}
+//
+// 	copy(result, createNeighbor(permutation, bestNeighbor[0], bestNeighbor[1]))
+//
+// 	return result, bestNeighbor
+// }
+//
+//
 func listContains(lst *list.List, value []int) bool{
   for e := lst.Front(); e != nil; e = e.Next() {
 
