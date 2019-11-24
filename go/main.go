@@ -25,6 +25,7 @@ func main() {
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
 	swapSteepestFile, swapSteepestWriter := getWriter("../results/swapSteepest.csv")
 	reverseSteepestFile, reverseSteepestWriter := getWriter("../results/reverseSteepest.csv")
+	tabuFile, tabuWriter := getWriter("../results/tabu.csv")
 	hFile, heuristicWriter := getWriter("../results/heuristic.csv")
 	rFile, randomWriter := getWriter("../results/random.csv")
 	stepMeanProcessingFile, stepMeanProcessingWriter := getWriter("../results/stepMeanProcessing-" + stepProcessingInstanceFilename + ".csv")
@@ -36,16 +37,19 @@ func main() {
 	defer reverseGreedyFile.Close()
 	defer swapSteepestFile.Close()
 	defer reverseSteepestFile.Close()
+	defer tabuFile.Close()
 	defer hFile.Close()
 	defer rFile.Close()
 	defer stepMeanProcessingFile.Close()
 	defer stepBestProcessingFile.Close()
 	defer stepSimilarityFile.Close()
 	defer runInternalQualitiesFile.Close()
+
 	defer swapGreedyWriter.Flush()
 	defer reverseGreedyWriter.Flush()
 	defer swapSteepestWriter.Flush()
 	defer reverseSteepestWriter.Flush()
+	defer tabuWriter.Flush()
 	defer heuristicWriter.Flush()
 	defer randomWriter.Flush()
 	defer stepMeanProcessingWriter.Flush()
@@ -53,10 +57,13 @@ func main() {
 	defer stepSimilarityWriter.Flush()
 	defer runInternalQualitiesWriter.Flush()
 
-	swapGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
-	reverseGreedyWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
-	swapSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
-	reverseSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
+	labels := []string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"}
+	swapGreedyWriter.Write(labels)
+	reverseGreedyWriter.Write(labels)
+	swapSteepestWriter.Write(labels)
+	reverseSteepestWriter.Write(labels)
+	tabuWriter.Write(labels)
+
 	heuristicWriter.Write([]string{"size", "best"})
 	randomWriter.Write([]string{"size", "best", "time"})
 	stepMeanProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
@@ -108,6 +115,9 @@ func main() {
 		swapGreedyWriter.Write(swapGreedyOutput)
 		_, reverseGreedyOutput, _, _, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
 		reverseGreedyWriter.Write(reverseGreedyOutput)
+
+		_, tabuOutput, _, _, _, _, _ := computeGS(solveTabu, distances, bestKnown, "Tabu", false)
+		tabuWriter.Write(tabuOutput)
 
 		swapSteepestElapsed, swapSteepestOutput, _, _, _, _, _ := computeGS(solveOptimizedSwapSteepest, distances, bestKnown, "SwapSteepest", false)
 		swapSteepestWriter.Write(swapSteepestOutput)
@@ -177,7 +187,6 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 
 	elapsed := time.Since(start)
 	bestResult := minOfArray(qualities)
-	fmt.Println(bestResult, qualities)
 
 	meanResult := mean(qualities)
 
@@ -185,7 +194,7 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 	meanSteps := meanInt(stepCounts)
 	meanReviewedSolutions := meanInt(reviewedSolutionsNumbers)
 
-	fmt.Println(name, "elapsed: ", elapsed, "best: ", bestResult, "mean: ", meanResult, "steps(mean): ", meanSteps, "std result: ", stdResult, "reviewed solutions(mean): ", meanReviewedSolutions)
+	fmt.Println(name, "mean: ", meanResult,)
 	output := []string{
 		itoa(len(distances)),
 		ftoa(bestResult),
@@ -242,7 +251,7 @@ func initializeFileNames() []string {
 		"ft53",
 		"ftv55",
 		"ft70",
-		"rbg323",
+		"kro124p",
 	}
 }
 
