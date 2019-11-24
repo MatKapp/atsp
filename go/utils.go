@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"math/rand"
 	"os"
 	"reflect"
 	"strconv"
@@ -271,6 +272,18 @@ func getPairStrings(array []int) []string {
 	result = append(result, (itoa(array[SIZE-1]) + "_" + itoa(array[0])))
 
 	return result
+}
+
+func randBool(probability float64) bool {
+	return isSmaller(rand.Float64(), probability)
+}
+
+func abs(value int) int {
+	if value >= 0 {
+		return value
+	} else {
+		return -value
+	}
 }
 
 func countSimilarity(array1, arary2 []int) float64 {

@@ -19,11 +19,12 @@ func main() {
 	bestKnownSolutions := initializaBestKnownSolutions()
 	instanceFilenames := initializeFileNames()
 
-	stepProcessingInstanceFilename := "rbg323"
+	stepProcessingInstanceFilename := "ft70"
 
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
 	swapSteepestFile, swapSteepestWriter := getWriter("../results/swapSteepest.csv")
+	saFile, saWriter := getWriter("../results/saSolver.csv")
 	reverseSteepestFile, reverseSteepestWriter := getWriter("../results/reverseSteepest.csv")
 	hFile, heuristicWriter := getWriter("../results/heuristic.csv")
 	rFile, randomWriter := getWriter("../results/random.csv")
@@ -34,6 +35,7 @@ func main() {
 
 	defer swapGreedyFile.Close()
 	defer reverseGreedyFile.Close()
+	defer saFile.Close()
 	defer swapSteepestFile.Close()
 	defer reverseSteepestFile.Close()
 	defer hFile.Close()
@@ -43,6 +45,7 @@ func main() {
 	defer stepSimilarityFile.Close()
 	defer runInternalQualitiesFile.Close()
 	defer swapGreedyWriter.Flush()
+	defer saWriter.Flush()
 	defer reverseGreedyWriter.Flush()
 	defer swapSteepestWriter.Flush()
 	defer reverseSteepestWriter.Flush()
@@ -58,6 +61,7 @@ func main() {
 	swapSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
 	reverseSteepestWriter.Write([]string{"size", "best", "mean", "mean_steps", "std", "time", "reviewed_solutions", "quality_time"})
 	heuristicWriter.Write([]string{"size", "best"})
+	saWriter.Write([]string{"size", "best"})
 	randomWriter.Write([]string{"size", "best", "time"})
 	stepMeanProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 	stepBestProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
@@ -108,6 +112,9 @@ func main() {
 		swapGreedyWriter.Write(swapGreedyOutput)
 		_, reverseGreedyOutput, _, _, _, _, _ := computeGS(solveReverseGreedy, distances, bestKnown, "ReverseGreedy", false)
 		reverseGreedyWriter.Write(reverseGreedyOutput)
+
+		_, saOutput, _, _, _, _, _ := computeGS(solveSaSolver, distances, bestKnown, "SaSolver", false)
+		saWriter.Write(saOutput)
 
 		swapSteepestElapsed, swapSteepestOutput, _, _, _, _, _ := computeGS(solveOptimizedSwapSteepest, distances, bestKnown, "SwapSteepest", false)
 		swapSteepestWriter.Write(swapSteepestOutput)
@@ -242,7 +249,6 @@ func initializeFileNames() []string {
 		"ft53",
 		"ftv55",
 		"ft70",
-		"rbg323",
 	}
 }
 
