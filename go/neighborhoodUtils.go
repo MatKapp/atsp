@@ -1,5 +1,9 @@
 package main
 
+import (
+	"math/rand"
+)
+
 func findBestSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
 	reviewedSolutionsNumber := 0
@@ -114,6 +118,30 @@ func findBetterSwapNeighborOptimized(permutation []int, distances [][]int, SIZE 
 	return permutation, reviewedSolutionsNumber
 }
 
+func saFindBetterSwapNeighborOptimized(permutation []int, distances [][]int, SIZE int, temperature float64) ([]int, int) {
+	reviewedSolutionsNumber := 0
+	offset := rand.Intn(SIZE)
+	iWithOffset := 0
+	jWithOffset := 0
+
+	for i := 0; i < SIZE-1; i++ {
+		iWithOffset = (i + offset) % (SIZE - 1)
+		for j := i + 1; j < SIZE; j++ {
+
+			jWithOffset = (j + offset) % SIZE
+
+			neighborProfit := countNeighborSwapProfit(permutation, distances, iWithOffset, jWithOffset, SIZE)
+			reviewedSolutionsNumber++
+
+			if neighborProfit > 0 || randBool(temperature*float64((1/min(4, max(1, abs(neighborProfit)))))) {
+				tmpSwap(permutation, iWithOffset, jWithOffset)
+				return permutation, reviewedSolutionsNumber
+			}
+		}
+	}
+	return permutation, reviewedSolutionsNumber
+}
+
 func findBetterSwapNeighbor(permutation []int, distances [][]int) ([]int, int) {
 	SIZE := len(permutation)
 	reviewedSolutionsNumber := 0
@@ -211,6 +239,13 @@ func countNeighborSwapProfit(perm []int, distances [][]int, start int, end int, 
 
 	if start == end {
 		return 0
+	}
+
+	// correct in case of swap neighborhood
+	if start > end {
+		temp := start
+		start = end
+		end = temp
 	}
 
 	actualPartialDistance := 0

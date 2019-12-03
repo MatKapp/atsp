@@ -329,3 +329,21 @@ func intersection(a, b []int) (c []int) {
 	}
 	return
 }
+
+func factorial(n uint64) (result uint64) {
+	if n > 0 {
+		result = n * factorial(n-1)
+		return result
+	}
+	return 1
+}
+
+func newtonSymbol(n, k uint64) uint64 {
+	divider := (factorial(k) * factorial(n-k))
+
+	if divider == 0 {
+		divider = 1
+	}
+
+	return (factorial(n) / divider)
+}

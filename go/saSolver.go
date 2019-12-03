@@ -3,27 +3,40 @@ package main
 func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
+	bestPermutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
 	var stepPermutations [][]int
 
-	saTemperature := 1.
-	saCoolingCoefficient := 0.98
+	saTemperature := 0.95
+	saCoolingCoefficient := .9
+	markovChainLength := newtonSymbol(uint64(SIZE), uint64(2))
+	stopCoefficient := uint64(10)
+	stepsWithoutImprovementBeforeStop := markovChainLength * stopCoefficient
+
+	//Start processing with swap greedy result
+	// permutation, _, _, _ = solveOptimizedSwapGreedy(distances, stepProcessing)
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
 	permutation = shuffle(permutation)
 
-	//Start processing with swap greedy result
-	permutation, _, _, _ = solveOptimizedSwapGreedy(distances, stepProcessing)
+	copy(bestPermutation, permutation)
 	bestResult := getDistance(permutation, distances)
-	resultImproved := true
+	stepsWithoutImprovement := uint64(0)
+	stepsWithoutTemperatureChange := uint64(0)
 
-	for ok := true; ok; ok = resultImproved {
-		resultImproved = false
+	for stepsWithoutImprovement <= stepsWithoutImprovementBeforeStop || saTemperature > .01 {
+		// for saTemperature > .01 {
 		reviewedNeighborSolutions := 0
-		permutation, reviewedNeighborSolutions = findBetterSwapNeighborOptimized(permutation, distances, SIZE)
+		permutation, reviewedNeighborSolutions = saFindBetterSwapNeighborOptimized(permutation, distances, SIZE, saTemperature)
+		stepsWithoutTemperatureChange++
+
+		if stepsWithoutTemperatureChange >= markovChainLength && stepsWithoutImprovement >= markovChainLength {
+			saTemperature = saCoolingCoefficient * saTemperature
+			stepsWithoutTemperatureChange = 0
+		}
 
 		if stepProcessing {
 			processingStep := makeArray(SIZE)
@@ -33,24 +46,20 @@ func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][
 		reviewedSolutionsNumber += reviewedNeighborSolutions
 
 		newResult := getDistance(permutation, distances)
-		profit := newResult - bestResult
+		profit := bestResult - newResult
 
-		saProbability := saTemperature * float64((1 / max(1, abs(profit))))
-		updateResult := false
-
-		if profit > 0 {
-			updateResult = true
-		} else {
-			updateResult = randBool(saProbability)
-			saTemperature *= saCoolingCoefficient
+		if profit >= 0 {
+			bestResult = newResult
+			copy(bestPermutation, permutation)
 		}
 
-		if updateResult {
-			bestResult = newResult
-			resultImproved = true
-			stepCount++
+		stepsWithoutImprovement++
+		stepCount++
+
+		if profit > 0 {
+			stepsWithoutImprovement = uint64(0)
 		}
 	}
 
-	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
+	return bestPermutation, stepCount, reviewedSolutionsNumber, stepPermutations
 }

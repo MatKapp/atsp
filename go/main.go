@@ -19,7 +19,7 @@ func main() {
 	bestKnownSolutions := initializaBestKnownSolutions()
 	instanceFilenames := initializeFileNames()
 
-	stepProcessingInstanceFilename := "ft70"
+	stepProcessingInstanceFilename := "kro124p"
 
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
@@ -86,7 +86,7 @@ func main() {
 		hOutput := computeHeuristic(distances, bestKnown)
 		heuristicWriter.Write(hOutput)
 
-		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities, runInternalQualities := computeGS(solveOptimizedSwapSteepest, distances, bestKnown, "SwapGreedy", stepProcessing)
+		_, swapGreedyOutput, meanResult, bestResult, stepPermutations, qualities, runInternalQualities := computeGS(solveOptimizedSwapGreedy, distances, bestKnown, "SwapGreedy", stepProcessing)
 
 		if stepProcessing {
 			for index, element := range meanResult {
@@ -249,6 +249,7 @@ func initializeFileNames() []string {
 		"ft53",
 		"ftv55",
 		"ft70",
+		"kro124p",
 	}
 }
 

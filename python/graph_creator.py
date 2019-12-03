@@ -23,13 +23,34 @@ def draw_plot(df, label, x_label, y_label, e_label=None, lines_visibility=True):
     x = df[x_label]
     y = df[y_label]
 
-    lines_style = '-' if lines_visibility else 'None'
+    # lines_style = '-' if lines_visibility else 'None'
+    width = 3 if 'swap' in label.lower() else 2
+    
+    if not lines_visibility:
+        lines_style = 'None'
+        marker = '^'
+    elif 'steepest' in label.lower():
+        lines_style = '-'
+        marker = '^'
+    elif 'greedy' in label.lower():
+        lines_style = '-.'
+        marker = 'o'
+    elif 'heuristic' in label.lower():
+        width = 1
+        marker = 'v'
+        lines_style = '--'
+    else:
+        width = 1
+        marker = '.'
+        lines_style = ':'
 
     if e_label:
         e = df[e_label]
-        plt.errorbar(x, y, e, label=label, marker='^', linestyle=lines_style)
+        plt.errorbar(x, y, e, label=label, marker=marker, linestyle=lines_style, linewidth=width)
+        # plt.errorbar(x, y, e, label=label, linewidth=width)
     else:
-        plt.plot(x, y, label=label, marker='^', linestyle=lines_style)
+        plt.plot(x, y, label=label, marker=marker, linestyle=lines_style, linewidth=width)
+        # plt.plot(x, y, label=label, linewidth=width)
     
     plt.ylabel(label_translations[y_label])
     plt.xlabel(label_translations[x_label])
@@ -56,7 +77,7 @@ def draw_for_files(files, x_label, y_label, e_label=None, lines_visibility=True)
         if data_file_name != '':
             data_file_name += '_'
 
-    graph_path = path.join('..', 'graphs', f'{data_file_name}{x_label}_{y_label}.png')
+    graph_path = path.join('..', 'graphs', f'{data_file_name}{x_label}_{y_label}.svg')
     plt.savefig(graph_path)
 
 def draw_for_prefixed_files(files_name_prefix, x_label, y_label, lines_visibility=True):
@@ -76,7 +97,7 @@ if __name__ == '__main__':
     gsr_files = swap_gs_files + ['random']
     gsrh_files = gsr_files + ['heuristic']
     draw_for_files(gsrh_files, 'size', 'best')
-    #draw_for_files(all_gs_files, 'size', 'best')
+    # draw_for_files(all_gs_files, 'size', 'best')
     draw_for_files(gsr_files, 'size', 'time')
     draw_for_files(swap_gs_files, 'size', 'mean', 'std')
     draw_for_files(swap_gs_files, 'size', 'mean_steps')
@@ -86,4 +107,4 @@ if __name__ == '__main__':
 
     draw_for_prefixed_files(step_processing_prefix, 'iteration_num', 'quality')
     draw_for_prefixed_files(similiarity_files_prefix, 'quality', 'similarity', False)
-#    draw_for_prefixed_files(internal_qualities_prefix, 'iteration_num', 'quality', False)
+    # draw_for_prefixed_files(internal_qualities_prefix, 'iteration_num', 'quality', False)
