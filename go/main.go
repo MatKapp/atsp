@@ -12,14 +12,14 @@ type fn func([][]int) ([]int, int)
 const MIN_TIME = 1000 * 1000
 const DEFAULT_RUN_COUNT = 10
 const STEP_RUN_COUNT = 400
-const GS_COUNT_STEPS = 10
+const GS_COUNT_STEPS = 400
 const STEP = STEP_RUN_COUNT / GS_COUNT_STEPS
 
 func main() {
 	bestKnownSolutions := initializaBestKnownSolutions()
 	instanceFilenames := initializeFileNames()
 
-	stepProcessingInstanceFilename := "kro124p"
+	stepProcessingInstanceFilename := "ftv170"
 
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
@@ -66,9 +66,9 @@ func main() {
 	swapSteepestWriter.Write(labels)
 	reverseSteepestWriter.Write(labels)
 	tabuWriter.Write(labels)
+	saWriter.Write(labels)
 
 	heuristicWriter.Write([]string{"size", "best"})
-	saWriter.Write([]string{"size", "best"})
 	randomWriter.Write([]string{"size", "best", "time"})
 	stepMeanProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 	stepBestProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
@@ -200,7 +200,7 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 	meanSteps := meanInt(stepCounts)
 	meanReviewedSolutions := meanInt(reviewedSolutionsNumbers)
 
-	fmt.Println(name, "mean: ", meanResult)
+	fmt.Println(name, "best: ", bestResult)
 	output := []string{
 		itoa(len(distances)),
 		ftoa(bestResult),
@@ -257,7 +257,7 @@ func initializeFileNames() []string {
 		"ft53",
 		"ftv55",
 		"ft70",
-		"kro124p",
+		"ftv170",
 	}
 }
 

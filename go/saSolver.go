@@ -9,9 +9,9 @@ func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][
 	var stepPermutations [][]int
 
 	saTemperature := 0.95
-	saCoolingCoefficient := .9
+	saCoolingCoefficient := .90
 	markovChainLength := newtonSymbol(uint64(SIZE), uint64(2))
-	stopCoefficient := uint64(10)
+	stopCoefficient := uint64(40)
 	stepsWithoutImprovementBeforeStop := markovChainLength * stopCoefficient
 
 	//Start processing with swap greedy result
@@ -28,9 +28,9 @@ func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][
 	stepsWithoutTemperatureChange := uint64(0)
 
 	for stepsWithoutImprovement <= stepsWithoutImprovementBeforeStop || saTemperature > .01 {
-		// for saTemperature > .01 {
 		reviewedNeighborSolutions := 0
 		permutation, reviewedNeighborSolutions = saFindBetterSwapNeighborOptimized(permutation, distances, SIZE, saTemperature)
+
 		stepsWithoutTemperatureChange++
 
 		if stepsWithoutTemperatureChange >= markovChainLength && stepsWithoutImprovement >= markovChainLength {

@@ -120,20 +120,21 @@ func findBetterSwapNeighborOptimized(permutation []int, distances [][]int, SIZE 
 
 func saFindBetterSwapNeighborOptimized(permutation []int, distances [][]int, SIZE int, temperature float64) ([]int, int) {
 	reviewedSolutionsNumber := 0
-	offset := rand.Intn(SIZE)
+	iOffset := rand.Intn(SIZE)
+	jOffset := rand.Intn(SIZE)
 	iWithOffset := 0
 	jWithOffset := 0
 
 	for i := 0; i < SIZE-1; i++ {
-		iWithOffset = (i + offset) % (SIZE - 1)
+		iWithOffset = (i + iOffset) % (SIZE - 1)
 		for j := i + 1; j < SIZE; j++ {
 
-			jWithOffset = (j + offset) % SIZE
+			jWithOffset = (j + jOffset) % SIZE
 
 			neighborProfit := countNeighborSwapProfit(permutation, distances, iWithOffset, jWithOffset, SIZE)
 			reviewedSolutionsNumber++
 
-			if neighborProfit > 0 || randBool(temperature*float64((1/min(4, max(1, abs(neighborProfit)))))) {
+			if neighborProfit > 0 || randBool(temperature*float64((1/min(2, max(1, abs(neighborProfit/3)))))) {
 				tmpSwap(permutation, iWithOffset, jWithOffset)
 				return permutation, reviewedSolutionsNumber
 			}

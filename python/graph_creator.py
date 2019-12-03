@@ -42,7 +42,7 @@ def draw_plot(df, label, x_label, y_label, e_label=None, lines_visibility=True):
     else:
         width = 1
         marker = '.'
-        lines_style = ':'
+        lines_style = '--'
 
     if e_label:
         e = df[e_label]
@@ -90,6 +90,7 @@ def extract_data_file_name(fileName):
 
 if __name__ == '__main__':
     swap_gs_files = ['swapGreedy', 'swapSteepest']
+    meta_heuristics_files = ['saSolver', 'tabu']
     step_processing_prefix = "step"
     similiarity_files_prefix = "similarity"
     internal_qualities_prefix = "runInternalPermutations"
@@ -108,3 +109,8 @@ if __name__ == '__main__':
     draw_for_prefixed_files(step_processing_prefix, 'iteration_num', 'quality')
     draw_for_prefixed_files(similiarity_files_prefix, 'quality', 'similarity', False)
     # draw_for_prefixed_files(internal_qualities_prefix, 'iteration_num', 'quality', False)
+    draw_for_files(meta_heuristics_files, 'size', 'best')
+    draw_for_files(meta_heuristics_files, 'size', 'time')
+    draw_for_files(meta_heuristics_files, 'size', 'quality_time')
+    draw_for_files(meta_heuristics_files, 'size', 'mean_steps')
+
