@@ -7,6 +7,7 @@ import re
 
 label_translations = {
     'quality': 'Jakość rozwiązania',
+    'squality': 'Jakość rozwiązania początkowego',
     'iteration_num': 'Numer iteracji',
     'similarity': 'Podobieństwo do najlepszego rozwiązania',
     'size': 'Rozmiar',
