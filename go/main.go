@@ -24,7 +24,7 @@ func main() {
 	swapGreedyFile, swapGreedyWriter := getWriter("../results/swapGreedy.csv")
 	reverseGreedyFile, reverseGreedyWriter := getWriter("../results/reverseGreedy.csv")
 	swapSteepestFile, swapSteepestWriter := getWriter("../results/swapSteepest.csv")
-	saFile, saWriter := getWriter("../results/saSolver.csv")
+	saFile, saWriter := getWriter("../results/sa.csv")
 	reverseSteepestFile, reverseSteepestWriter := getWriter("../results/reverseSteepest.csv")
 	tabuFile, tabuWriter := getWriter("../results/tabu.csv")
 	hFile, heuristicWriter := getWriter("../results/heuristic.csv")
@@ -73,7 +73,7 @@ func main() {
 	stepMeanProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 	stepBestProcessingWriter.Write([]string{"step", "iteration_num", "quality"})
 	stepSimilarityWriter.Write([]string{"step", "quality", "similarity"})
-	runInternalQualitiesWriter.Write([]string{"iteration_num", "quality"})
+	runInternalQualitiesWriter.Write([]string{"iteration_num", "squality", "quality"})
 
 	for _, filename := range instanceFilenames {
 		fmt.Println()
@@ -112,7 +112,7 @@ func main() {
 			}
 
 			for index, element := range runInternalQualities {
-				runInternalQualitiesWriter.Write([]string{itoa(index), ftoa(element)})
+				runInternalQualitiesWriter.Write([]string{itoa(index), ftoa(element[1]), ftoa(element[0])})
 			}
 		}
 
@@ -135,7 +135,7 @@ func main() {
 	}
 }
 
-func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64, []float64) {
+func computeGS(solve func([][]int, bool) ([]int, int, int, []int), distances [][]int, bestKnown int, name string, stepProcessing bool) (time.Duration, []string, []float64, []float64, [][]int, []float64, [][]float64) {
 	runCount := DEFAULT_RUN_COUNT
 
 	if stepProcessing {
@@ -149,19 +149,16 @@ func computeGS(solve func([][]int, bool) ([]int, int, int, [][]int), distances [
 	meanResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
 	bestResultsAfterStep := make([]float64, GS_COUNT_STEPS-1)
 	startupResults := make([][]int, runCount)
-	var runInternalQualities []float64
+	var runInternalQualities [][]float64
 
 	if stepProcessing {
 
 		for i := 0; i < runCount || time.Since(start).Nanoseconds() < MIN_TIME; i++ {
-			permutation, stepCount, reviewedSolutions, internalPermutations := solve(distances, stepProcessing)
+			permutation, stepCount, reviewedSolutions, startPermutation := solve(distances, stepProcessing)
 
-			if i == 0 {
-				for j := 0; j < len(internalPermutations); j++ {
-					distance := getDistance(internalPermutations[j], distances)
-					runInternalQualities = append(runInternalQualities, getQuality(distance, bestKnown))
-				}
-			}
+			quality := getQuality(getDistance(permutation, distances), bestKnown)
+			startQuality :=  getQuality(getDistance(startPermutation, distances), bestKnown)
+			runInternalQualities = append(runInternalQualities, []float64{quality, startQuality})
 
 			if i < runCount {
 				startupResults[i] = permutation

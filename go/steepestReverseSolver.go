@@ -1,16 +1,17 @@
 package main
 
-func solveReverseSteepest(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
+func solveReverseSteepest(distances [][]int, stepProcessing bool) ([]int, int, int, []int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
-	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
 	permutation = shuffle(permutation)
+	startPermutation := makeArray(SIZE)
+	copy(startPermutation, permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -27,20 +28,21 @@ func solveReverseSteepest(distances [][]int, stepProcessing bool) ([]int, int, i
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
+	return permutation, stepCount, reviewedSolutionsNumber, startPermutation
 }
 
-func solveOptimizedReverseSteepest(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
+func solveOptimizedReverseSteepest(distances [][]int, stepProcessing bool) ([]int, int, int, []int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
-	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
 	permutation = shuffle(permutation)
+	startPermutation := makeArray(SIZE)
+	copy(startPermutation, permutation)
 
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
@@ -58,5 +60,5 @@ func solveOptimizedReverseSteepest(distances [][]int, stepProcessing bool) ([]in
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
+	return permutation, stepCount, reviewedSolutionsNumber, startPermutation
 }

@@ -1,12 +1,12 @@
 package main
 
-func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
+func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, []int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	bestPermutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
-	var stepPermutations [][]int
+
 
 	saTemperature := 0.95
 	saCoolingCoefficient := .90
@@ -21,6 +21,8 @@ func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][
 		permutation[i] = i
 	}
 	permutation = shuffle(permutation)
+	startPermutation := makeArray(SIZE)
+	copy(startPermutation, permutation)
 
 	copy(bestPermutation, permutation)
 	bestResult := getDistance(permutation, distances)
@@ -41,7 +43,6 @@ func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][
 		if stepProcessing {
 			processingStep := makeArray(SIZE)
 			copy(processingStep, permutation)
-			stepPermutations = append(stepPermutations, processingStep)
 		}
 		reviewedSolutionsNumber += reviewedNeighborSolutions
 
@@ -61,5 +62,5 @@ func solveSaSolver(distances [][]int, stepProcessing bool) ([]int, int, int, [][
 		}
 	}
 
-	return bestPermutation, stepCount, reviewedSolutionsNumber, stepPermutations
+	return bestPermutation, stepCount, reviewedSolutionsNumber, startPermutation
 }

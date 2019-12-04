@@ -1,16 +1,17 @@
 package main
 
-func solveSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
+func solveSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, []int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
-	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
 	permutation = shuffle(permutation)
+	startPermutation := makeArray(SIZE)
+	copy(startPermutation, permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -27,20 +28,21 @@ func solveSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [
 			stepCount++
 		}
 	}
-	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
+	return permutation, stepCount, reviewedSolutionsNumber, startPermutation
 }
 
-func solveOptimizedSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int) {
+func solveOptimizedSwapGreedy(distances [][]int, stepProcessing bool) ([]int, int, int, []int) {
 	SIZE := len(distances)
 	permutation := makeArray(SIZE)
 	stepCount := 0
 	reviewedSolutionsNumber := 0
-	var stepPermutations [][]int
 
 	for i := 0; i < SIZE; i++ {
 		permutation[i] = i
 	}
 	permutation = shuffle(permutation)
+	startPermutation := makeArray(SIZE)
+	copy(startPermutation, permutation)
 	bestResult := getDistance(permutation, distances)
 	resultImproved := true
 
@@ -51,7 +53,6 @@ func solveOptimizedSwapGreedy(distances [][]int, stepProcessing bool) ([]int, in
 		if stepProcessing {
 			processingStep := makeArray(SIZE)
 			copy(processingStep, permutation)
-			stepPermutations = append(stepPermutations, processingStep)
 		}
 
 		reviewedSolutionsNumber += reviewedNeighborSolutions
@@ -64,5 +65,5 @@ func solveOptimizedSwapGreedy(distances [][]int, stepProcessing bool) ([]int, in
 		}
 	}
 
-	return permutation, stepCount, reviewedSolutionsNumber, stepPermutations
+	return permutation, stepCount, reviewedSolutionsNumber, startPermutation
 }

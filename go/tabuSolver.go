@@ -6,7 +6,7 @@ import (
   // "fmt"
   )
 
-func solveTabu(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int)  {
+func solveTabu(distances [][]int, stepProcessing bool) ([]int, int, int, []int)  {
 	SIZE := len(distances)
   // TODO parametrize TABU_SIZE and WAIT_ITERATIONS
   TABU_SIZE := SIZE / 4
@@ -14,6 +14,8 @@ func solveTabu(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int
 	stepCount := 0
 	reviewedSolutionsNumber := 0
 	permutation := makePermutation(SIZE)
+	startPermutation := makeArray(SIZE)
+	copy(startPermutation, permutation)
 	// permutation = shuffle(permutation)
 
   bestPermutation := makeArray(SIZE)
@@ -44,7 +46,7 @@ func solveTabu(distances [][]int, stepProcessing bool) ([]int, int, int, [][]int
       }
 		}
 	}
-	return bestPermutation, stepCount, reviewedSolutionsNumber, [][]int{}
+	return bestPermutation, stepCount, reviewedSolutionsNumber, startPermutation
 }
 
 func findTabuNeighbor(permutation []int, distances [][]int, SIZE int, tabuList *list.List) ([]int, int, []int, int) {

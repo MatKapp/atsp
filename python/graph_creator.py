@@ -25,7 +25,7 @@ def draw_plot(df, label, x_label, y_label, e_label=None, lines_visibility=True):
 
     # lines_style = '-' if lines_visibility else 'None'
     width = 3 if 'swap' in label.lower() else 2
-    
+
     if not lines_visibility:
         lines_style = 'None'
         marker = '^'
@@ -51,7 +51,7 @@ def draw_plot(df, label, x_label, y_label, e_label=None, lines_visibility=True):
     else:
         plt.plot(x, y, label=label, marker=marker, linestyle=lines_style, linewidth=width)
         # plt.plot(x, y, label=label, linewidth=width)
-    
+
     plt.ylabel(label_translations[y_label])
     plt.xlabel(label_translations[x_label])
 
@@ -62,14 +62,16 @@ def draw_plot(df, label, x_label, y_label, e_label=None, lines_visibility=True):
 def draw_for_files(files, x_label, y_label, e_label=None, lines_visibility=True):
     plt.clf()
     for file in files:
+        print(file, x_label, y_label)
         data_path = ''
-        
+
         if file.endswith('.csv'):
             data_path = path.join('..', 'results', file)
         else:
             data_path = path.join('..', 'results', f'{file}.csv')
-        
+
         df = pd.read_csv(data_path)
+        print(df.head())
         draw_plot(df, file,  x_label, y_label, e_label, lines_visibility)
 
         data_file_name = extract_data_file_name(file)
@@ -90,27 +92,26 @@ def extract_data_file_name(fileName):
 
 if __name__ == '__main__':
     swap_gs_files = ['swapGreedy', 'swapSteepest']
-    meta_heuristics_files = ['saSolver', 'tabu']
+    meta_heuristics_files = ['sa', 'tabu'] + swap_gs_files
     step_processing_prefix = "step"
     similiarity_files_prefix = "similarity"
     internal_qualities_prefix = "runInternalPermutations"
     all_gs_files = swap_gs_files + ['reverseGreedy', 'reverseSteepest']
     gsr_files = swap_gs_files + ['random']
     gsrh_files = gsr_files + ['heuristic']
-    draw_for_files(gsrh_files, 'size', 'best')
-    # draw_for_files(all_gs_files, 'size', 'best')
-    draw_for_files(gsr_files, 'size', 'time')
-    draw_for_files(swap_gs_files, 'size', 'mean', 'std')
-    draw_for_files(swap_gs_files, 'size', 'mean_steps')
-    draw_for_files(all_gs_files, 'size', 'mean_steps')
-    draw_for_files(all_gs_files, 'size', 'reviewed_solutions')
-    draw_for_files(all_gs_files, 'size', 'quality_time')
+    # draw_for_files(gsrh_files, 'size', 'best')
+    # # draw_for_files(all_gs_files, 'size', 'best')
+    # draw_for_files(gsr_files, 'size', 'time')
+    # draw_for_files(swap_gs_files, 'size', 'mean', 'std')
+    # draw_for_files(swap_gs_files, 'size', 'mean_steps')
+    # draw_for_files(all_gs_files, 'size', 'mean_steps')
+    # draw_for_files(all_gs_files, 'size', 'reviewed_solutions')
+    # draw_for_files(all_gs_files, 'size', 'quality_time')
 
-    draw_for_prefixed_files(step_processing_prefix, 'iteration_num', 'quality')
-    draw_for_prefixed_files(similiarity_files_prefix, 'quality', 'similarity', False)
-    # draw_for_prefixed_files(internal_qualities_prefix, 'iteration_num', 'quality', False)
+    # draw_for_prefixed_files(step_processing_prefix, 'iteration_num', 'quality')
+    # draw_for_prefixed_files(similiarity_files_prefix, 'quality', 'similarity', False)
+    draw_for_prefixed_files(internal_qualities_prefix, 'squality', 'quality', False)
     draw_for_files(meta_heuristics_files, 'size', 'best')
     draw_for_files(meta_heuristics_files, 'size', 'time')
     draw_for_files(meta_heuristics_files, 'size', 'quality_time')
     draw_for_files(meta_heuristics_files, 'size', 'mean_steps')
-
